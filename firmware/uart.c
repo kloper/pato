@@ -23,6 +23,7 @@ uint8_t g_uart_inbuf_head = 0;
 uint8_t g_uart_inbuf[UART_INBUF_SIZE];
 uint8_t g_uart_outbuf[UART_OUTBUF_SIZE];
 
+#ifdef UART_ISR_C_IMPL
 ISR(USART0_RX_vect)
 {
    uint8_t ucsr = 0;
@@ -41,6 +42,7 @@ ISR(USART0_RX_vect)
       }
    } while(1);
 }
+#endif /* UART_ISR_C_IMPL */
 
 void uart_init()
 {
