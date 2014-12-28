@@ -13,7 +13,13 @@
 #include <string.h>
 #include <stdint.h>
 
+#include <avr/eeprom.h>
+#include <avr/interrupt.h>
+
+#include "config.h"
+#include "protocol.h"
 #include "hd44780.h"
+#include "uart.h"
 
 /****************************************************************************
  * Definitions
@@ -30,18 +36,24 @@
 /****************************************************************************
  * Public Functions
  ****************************************************************************/
- 
+
 int main(int argc, char *argv[])
 {
-   int i = 0;
-   
+   packet_t *packet = NULL;
+
+   uart_init();
+
    hd44780_reset(0x2c);
    hd44780_ir_write(0x0f);
    hd44780_wait_busy();
    hd44780_ir_write(0x06);
    hd44780_wait_busy();
-   for( i = 0; i < 80; i++) {
-      hd44780_dr_write((' '+i) % 127);
+
+   sei();   
+   while(1) {
+      packet = uart_recv();
+
+      hd44780_dr_write(packet->arg0 & 0x7f);
       hd44780_wait_busy();
    }
    return 0;
