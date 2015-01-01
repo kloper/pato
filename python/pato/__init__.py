@@ -32,6 +32,9 @@ class Pato(object):
         if bytes_written != len(request):
             raise ProtocolException("Failed to send request")
 
+        if cmd == Cmd.RESET:
+            return None
+        
         reply_size = 5
         reply = self.transport.read(reply_size)
         if len(reply) != reply_size:
