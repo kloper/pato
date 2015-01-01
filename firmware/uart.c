@@ -68,8 +68,6 @@ void uart_init()
       UBRR0L = ubrr & 0xff;
    }
    
-  /* Select baud, parity, nubmer of bits, stop bits, etc. */
- 
   /* Select parity */
 
   {
