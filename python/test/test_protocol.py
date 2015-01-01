@@ -79,11 +79,4 @@ class Test(unittest.TestCase):
         pato = Pato(self.transport)
         for c in "Hello World":
             rc = pato.execute(Cmd.DIRECT, Direct.WRITE, ord(c))
-
-    def test_write_multi(self):
-        pato = Pato(self.transport)
-        pato.execute(Cmd.DIRECT, Direct.FUNC, True, True, False)
-        for c in xrange(ord("0"), 127):
-            rc = pato.execute(Cmd.DIRECT, Direct.WRITE, c)
-            pdb.set_trace()
             

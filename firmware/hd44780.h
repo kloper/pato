@@ -43,7 +43,7 @@
 #define HD44780_CMD_SHIFT_DISPLAY      0x08
 #define HD44780_CMD_SHIFT_RIGHT        0x04
 #define HD44780_CMD_FUNC_SET           0x20
-#define HD44780_CMD_FUNC_4BIT          0x10
+#define HD44780_CMD_FUNC_8BIT          0x10
 #define HD44780_CMD_FUNC_2LINES        0x08
 #define HD44780_CMD_FUNC_5x10          0x04
 #define HD44780_CMD_SET_CGRAM_ADDR     0x40

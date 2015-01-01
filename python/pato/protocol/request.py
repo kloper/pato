@@ -62,8 +62,8 @@ Shift.register(Cmd.DIRECT, Direct.SHIFT)
 
 class FunctionSet(Request):
     @classmethod
-    def compile(cls, narrow_bus, two_lines, large_font):
-        param = (16 if narrow_bus else 0) | \
+    def compile(cls, wide_bus, two_lines, large_font):
+        param = (16 if wide_bus else 0) | \
                 (8 if two_lines else 0) | \
                 (4 if large_font else 0)
         return super(FunctionSet, cls).compile([Direct.FUNC, param])
