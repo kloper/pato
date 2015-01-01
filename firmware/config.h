@@ -21,4 +21,6 @@ extern uint8_t EEMEM uart_databits;
 extern uint8_t EEMEM uart_parity;
 extern uint8_t EEMEM uart_stopbits;
 
+extern uint8_t EEMEM hd44780_initfunc;
+
 #endif /* _pato_config_h_ */

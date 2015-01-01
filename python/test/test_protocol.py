@@ -2,7 +2,7 @@
 #
 # Copyright (c) Dimitry Kloper <kloper@users.sf.net> 2014-2015
 #
-# python/test/test_packet.py -- driver for sending raw packets to pato
+# python/test/test_protocol.py -- test for protocol stuff
 #
 
 import os
@@ -20,8 +20,8 @@ import logging.config
 localdir = os.path.dirname( os.path.realpath(__file__) );
 sys.path.append( os.path.join( localdir, '..') );
 
-import pato.protocol as protocol
-from pato.protocol.crc import crc8
+from pato import Pato
+from pato.protocol import Cmd, Direct
 
 logging.config.dictConfig( 
     { 'version': 1,              
@@ -69,11 +69,21 @@ class Test(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.transport.close()                
+    
+    def test_ping(self):
+        pato = Pato(self.transport)
+        rc = pato.execute(Cmd.PING, 0)
+        self.assertTrue(rc == 1)
 
-    def test_send_single_ping(self):
-        packet = [ protocol.Cmd.PING, 0, 0 ]
-        packet += [ crc8(packet), 0 ]
-        packet = "".join( [chr(c) for c in packet] )
+    def test_write(self):
+        pato = Pato(self.transport)
+        for c in "Hello World":
+            rc = pato.execute(Cmd.DIRECT, Direct.WRITE, ord(c))
 
-        pdb.set_trace()
-        self.transport.write(packet)
+    def test_write_multi(self):
+        pato = Pato(self.transport)
+        pato.execute(Cmd.DIRECT, Direct.FUNC, True, True, False)
+        for c in xrange(ord("0"), 127):
+            rc = pato.execute(Cmd.DIRECT, Direct.WRITE, c)
+            pdb.set_trace()
+            

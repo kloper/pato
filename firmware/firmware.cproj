@@ -107,6 +107,12 @@
     <Compile Include="config.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="crc.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="crc.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="hd44780.h">
       <SubType>compile</SubType>
     </Compile>

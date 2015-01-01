@@ -15,6 +15,7 @@
 
 #include <avr/eeprom.h>
 
+#include "hd44780.h"
 
 /****************************************************************************
  * Definitions
@@ -37,4 +38,7 @@ uint8_t EEMEM uart_databits = 8;
 uint8_t EEMEM uart_parity = 2;
 uint8_t EEMEM uart_stopbits = 1;
 
+uint8_t EEMEM hd44780_initfunc = HD44780_CMD_FUNC_SET  |
+				 HD44780_CMD_FUNC_4BIT |
+				 HD44780_CMD_FUNC_2LINES;
 

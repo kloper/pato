@@ -30,6 +30,25 @@
 #define HD44780_DB7 PC7
 #define HD44780_BUSY PC7
 
+#define HD44780_CMD_CLEAR_SCREEN       0x01
+#define HD44780_CMD_RETURN_HOME        0x02
+#define HD44780_CMD_EMS                0x04
+#define HD44780_CMD_EMS_INCR           0x02
+#define HD44780_CMD_EMS_SHIFT          0x01
+#define HD44780_CMD_DISPLAY            0x08
+#define HD44780_CMD_DISPLAY_ON         0x04
+#define HD44780_CMD_DISPLAY_CURS_ON    0x02
+#define HD44780_CMD_DISPLAY_CURS_BLINK 0x01
+#define HD44780_CMD_SHIFT              0x10
+#define HD44780_CMD_SHIFT_DISPLAY      0x08
+#define HD44780_CMD_SHIFT_RIGHT        0x04
+#define HD44780_CMD_FUNC_SET           0x20
+#define HD44780_CMD_FUNC_4BIT          0x10
+#define HD44780_CMD_FUNC_2LINES        0x08
+#define HD44780_CMD_FUNC_5x10          0x04
+#define HD44780_CMD_SET_CGRAM_ADDR     0x40
+#define HD44780_CMD_SET_DDRAM_ADDR     0x80
+
 #ifndef __ASSEMBLY__
 extern void hd44780_reset(uint8_t cmd);
 extern void hd44780_ir_write(uint8_t cmd);

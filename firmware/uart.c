@@ -134,3 +134,18 @@ packet_t *uart_recv()
    
    return packet;
 }
+
+void *uart_outbuf()
+{
+   return g_uart_outbuf;
+}
+
+void uart_send()
+{
+   int i = 0;
+
+   for( i = 0; i < sizeof(g_uart_outbuf); i++ ) {
+      while ((UCSR0A & (1 << UDRE0)) == 0);
+      UDR0 = g_uart_outbuf[i];
+   }
+}
