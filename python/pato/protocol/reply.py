@@ -102,6 +102,6 @@ class Read(Reply):
     @classmethod
     def parse(cls, packet):
         arg0, arg1 = super(Read, cls).parse(packet)
-        return arg0
+        return (arg0, arg1)
 
 Read.register(Cmd.DIRECT, Direct.READ)
