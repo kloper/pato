@@ -108,6 +108,13 @@ hd44780_reset:
 	cbi HD44780_CTRL_OUT, HD44780_RW
 	cbi HD44780_CTRL_OUT, HD44780_EN	
 	cbi HD44780_CTRL_OUT, HD44780_RST
+
+	;; if only shutdown is required - exit
+	cpi r24, 0xff
+	brne 10f
+	ret
+
+10:	
 	delay 0xff
 	sbi HD44780_CTRL_OUT, HD44780_RST
 	mov r25, r24

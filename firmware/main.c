@@ -130,17 +130,18 @@ int main(int argc, char *argv[])
 	       break;
 	    case PATO_CMD_RESET:
 	       switch(packet->arg0) {
-		  case 0:
-		     hd44780_reset(reset_value);
-		     break;
 		  case 1:
-		     hd44780_reset(packet->arg1);
+		     cmd = packet->arg1;
 		     break;
 		  case 2:
-		     asm( "cbi %0, %1\n\t"
-			  : : "I" (HD44780_CTRL_OUT), "I" (HD44780_RST) );
+		     cmd = 0xff;
+		     break;
+		  default:
+		  case 0:
+		     cmd = reset_value;
 		     break;
 	       }
+	       hd44780_reset(cmd);
 	       break;
 	    default:
 	       reply->cmd = PATO_REPLY_ERROR;
