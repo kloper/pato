@@ -27,16 +27,6 @@
 	sbi	HD44780_DATA_OUT, \outnum
 	.endm
 	
-	.macro nibble_out vreg
-	sbi HD44780_CTRL_OUT, HD44780_EN
-	delay 6
-	bit_out \vreg, 0, HD44780_DB4
-	bit_out \vreg, 1, HD44780_DB5
-	bit_out \vreg, 2, HD44780_DB6
-	bit_out \vreg, 3, HD44780_DB7
-	cbi HD44780_CTRL_OUT, HD44780_EN
-	delay 8
-	.endm
 	
 	.macro bit_in vreg, innum
 	lsl	\vreg
@@ -44,16 +34,31 @@
 	inc	\vreg
 	.endm
 
-	.macro nibble_in vreg
+	.func nibble_out
+nibble_out:	
 	sbi HD44780_CTRL_OUT, HD44780_EN
 	delay 6
-	bit_in \vreg, HD44780_DB7
-	bit_in \vreg, HD44780_DB6
-	bit_in \vreg, HD44780_DB5
-	bit_in \vreg, HD44780_DB4
+	bit_out r24, 0, HD44780_DB4
+	bit_out r24, 1, HD44780_DB5
+	bit_out r24, 2, HD44780_DB6
+	bit_out r24, 3, HD44780_DB7
 	cbi HD44780_CTRL_OUT, HD44780_EN
 	delay 8
-	.endm
+	ret
+	.endfunc
+
+	.func nibble_in
+nibble_in:	
+	sbi HD44780_CTRL_OUT, HD44780_EN
+	delay 6
+	bit_in r24, HD44780_DB7
+	bit_in r24, HD44780_DB6
+	bit_in r24, HD44780_DB5
+	bit_in r24, HD44780_DB4
+	cbi HD44780_CTRL_OUT, HD44780_EN
+	delay 8
+	ret
+	.endfunc
 	
 	.func data_ddr_in
 data_ddr_in:	
@@ -76,17 +81,17 @@ data_ddr_out:
 	.func byte_out
 byte_out:
 	swap	r24
-	nibble_out r24
+	call 	nibble_out
 	swap	r24
-	nibble_out r24
+	call 	nibble_out 
 	ret
 	.endfunc
 
 	.func byte_in
 byte_in:	
 	clr r24
-	nibble_in r24
-	nibble_in r24
+	call nibble_in
+	call nibble_in
 	ret
 	.endfunc
 	
@@ -122,7 +127,7 @@ hd44780_reset:
 
 	mov r24, r25	
 	swap r24
-	nibble_out r24
+	call nibble_out
 	delay 0x8
 
 	mov r24, r25
