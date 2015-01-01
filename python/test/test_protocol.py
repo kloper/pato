@@ -79,4 +79,26 @@ class Test(unittest.TestCase):
         pato = Pato(self.transport)
         for c in "Hello World":
             rc = pato.execute(Cmd.DIRECT, Direct.WRITE, ord(c))
+
+    def test_read(self):
+        pato = Pato(self.transport)
+
+        pato.execute(Cmd.RESET, 0)
+        pato.execute(Cmd.DIRECT, Direct.DCTRL, True, True, True)
+        pato.execute(Cmd.DIRECT, Direct.EMS, True, False)
+        
+        str = "Hello World"
+        for c in str:
+            rc = pato.execute(Cmd.DIRECT, Direct.WRITE, ord(c))
             
+        pato.execute(Cmd.DIRECT, Direct.DDADDR, 0)
+        pato.execute(Cmd.DIRECT, Direct.READ)
+
+        res = ""
+        for _ in xrange(len(str)):
+            (addr, char) = pato.execute(Cmd.DIRECT, Direct.READ)
+            res += chr(char)
+
+        self.assertTrue( res == str )
+        
+        
