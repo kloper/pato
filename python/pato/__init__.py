@@ -23,7 +23,7 @@ class Pato(object):
             args = args[1:]
         assert request_class is not None, \
             "Can't find request template for  command: {}".format(cmd)
-        assert reply_class is not None or cmd == Cmd.RESET, \
+        assert reply_class is not None, \
             "Can't find reply template for command : {}".format(cmd)
 
         request = request_class.compile(*args, **kwargs)
@@ -31,9 +31,6 @@ class Pato(object):
 
         if bytes_written != len(request):
             raise ProtocolException("Failed to send request")
-
-        if cmd == Cmd.RESET:
-            return None
         
         reply_size = 5
         reply = self.transport.read(reply_size)

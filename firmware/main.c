@@ -122,6 +122,9 @@ int main(int argc, char *argv[])
 		     break;
 	       }
 	       hd44780_reset(cmd);
+	       reply->cmd = PATO_REPLY_OK;
+	       reply->arg0 = cmd;
+	       reply->arg1 = packet->cmd;
 	       break;
 	    default:
 	       reply->cmd = PATO_REPLY_ERROR;
