@@ -116,8 +116,8 @@ Reset.register(Cmd.RESET)
 class PrintSetAddr(Request):
     @classmethod
     def compile(cls, addr):
-        return super(PrintSetAddr, cls).compile([(addr >> 8) & 0xff,
-                                                 addr & 0xff])
+        return super(PrintSetAddr, cls).compile([addr & 0xff,
+                                                 (addr >> 8) & 0xff])
     
 PrintSetAddr.register(Cmd.PRINT_SETADDR)
 

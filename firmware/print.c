@@ -41,7 +41,7 @@ uint8_t hd44780_print_commit()
    args = memchr(print_buffer.buffer, 0, PATO_PRINT_BUFFER_SIZE);
    
    if( args != NULL ) {
-      vfprintf(&hd44780_out, (const char*)print_buffer.buffer, args);
+      vfprintf(&hd44780_out, (const char*)print_buffer.buffer, args+1);
       return 1;
    }
 
