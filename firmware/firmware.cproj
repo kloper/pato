@@ -122,6 +122,12 @@
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="print.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="print.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="protocol.h">
       <SubType>compile</SubType>
     </Compile>

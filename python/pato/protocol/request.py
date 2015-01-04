@@ -112,3 +112,32 @@ class Reset(Request):
         return super(Reset, cls).compile([param, value])
     
 Reset.register(Cmd.RESET)
+
+class PrintSetAddr(Request):
+    @classmethod
+    def compile(cls, addr):
+        return super(PrintSetAddr, cls).compile([(addr >> 8) & 0xff,
+                                                 addr & 0xff])
+    
+PrintSetAddr.register(Cmd.PRINT_SETADDR)
+
+class PrintGetAddr(Request):
+    @classmethod
+    def compile(cls):
+        return super(PrintGetAddr, cls).compile([0, 0])
+    
+PrintGetAddr.register(Cmd.PRINT_GETADDR)
+
+class PrintPut(Request):
+    @classmethod
+    def compile(cls, b0, b1):
+        return super(PrintPut, cls).compile([b0 & 0xff, b1 & 0xff])
+    
+PrintPut.register(Cmd.PRINT_PUT)
+
+class PrintCommit(Request):
+    @classmethod
+    def compile(cls):
+        return super(PrintCommit, cls).compile([0, 0])
+    
+PrintCommit.register(Cmd.PRINT_COMMIT)

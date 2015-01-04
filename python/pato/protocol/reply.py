@@ -5,6 +5,8 @@
 # python/pato/protocol/reply.py -- basic stuff for constructing Pato replys
 #
 
+import pdb
+
 from pato.protocol.packet import Reply
 from pato.protocol import Cmd, Direct, Reply as ReplyVal, Error
 
@@ -105,3 +107,53 @@ class Read(Reply):
         return (arg0, arg1)
 
 Read.register(Cmd.DIRECT, Direct.READ)
+
+class Reset(Reply):
+    @classmethod
+    def parse(cls, packet):
+        rc, cmd = super(Reset, cls).parse(packet)
+        cls.assertTrue(cmd == Cmd.RESET,
+                       "Unexpected command in reply: {}".format(cmd))
+        return rc
+
+Reset.register(Cmd.RESET)
+
+class PrintSetAddr(Reply):
+    @classmethod
+    def parse(cls, packet):
+         rc, cmd = super(PrintSetAddr, cls).parse(packet)
+         cls.assertTrue(cmd == Cmd.PRINT_SETADDR,
+                        "Unexpected command in reply: {}".format(cmd))
+         cls.assertTrue(rc != 0, "Unable to set print buffer address")
+         return rc
+    
+PrintSetAddr.register(Cmd.PRINT_SETADDR)
+
+class PrintGetAddr(Reply):
+    @classmethod
+    def parse(cls, packet):
+        b0, b1 = super(PrintGetAddr, cls).parse(packet)
+        return ((b1 << 8) | b0)
+    
+PrintGetAddr.register(Cmd.PRINT_GETADDR)
+
+class PrintPut(Reply):
+    @classmethod
+    def parse(cls, packet):
+        rc, cmd = super(PrintPut, cls).parse(packet)
+        cls.assertTrue(cmd == Cmd.PRINT_PUT,
+                       "Unexpected command in reply: {}".format(cmd))
+        cls.assertTrue(rc != 0, "Unable to put into print buffer")
+        return rc
+    
+PrintPut.register(Cmd.PRINT_PUT)
+
+class PrintCommit(Reply):
+    @classmethod
+    def parse(cls, packet):
+        rc, cmd = super(PrintCommit, cls).parse(packet)
+        cls.assertTrue(cmd == Cmd.PRINT_COMMIT,
+                       "Unexpected command in reply: {}".format(cmd))
+        return rc
+    
+PrintCommit.register(Cmd.PRINT_COMMIT)

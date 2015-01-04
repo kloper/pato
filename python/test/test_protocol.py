@@ -101,4 +101,19 @@ class Test(unittest.TestCase):
 
         self.assertTrue( res == str )
         
-        
+    def test_print(self):
+        pato = Pato(self.transport)
+
+        pato.execute(Cmd.RESET, 0)
+        pato.execute(Cmd.DIRECT, Direct.DCTRL, True, True, True)
+        pato.execute(Cmd.DIRECT, Direct.EMS, True, False)
+
+        def pairs(str):
+            for i in xrange(0, len(str), 2):
+                yield str[i:i+2]
+
+        pato.execute(Cmd.PRINT_SETADDR, 0)
+        str = "Hello World!!! 1 2 3 4 5 \0"
+        for pair in pairs(str):
+            pato.execute(Cmd.PRINT_PUT, ord(pair[0]), ord(pair[1]))
+        pato.execute(Cmd.PRINT_COMMIT)

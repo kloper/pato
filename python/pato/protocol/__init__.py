@@ -14,7 +14,11 @@ class Cmd:
     RESET = 0x02
     CONTRAST = 0x03
     BACKLIGHT = 0x04
-
+    PRINT_SETADDR = 0x05
+    PRINT_GETADDR = 0x06
+    PRINT_PUT = 0x07
+    PRINT_COMMIT = 0x08
+    
 class Direct:
     CLR = 0x01
     HOME = 0x02

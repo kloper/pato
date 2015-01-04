@@ -17,6 +17,7 @@
 #include "hd44780.h"
 #include "uart.h"
 #include "crc.h"
+#include "print.h"
 
 int main(int argc, char *argv[])
 {
@@ -122,6 +123,28 @@ int main(int argc, char *argv[])
 		     break;
 	       }
 	       hd44780_reset(cmd);
+	       reply->cmd = PATO_REPLY_OK;
+	       reply->arg0 = cmd;
+	       reply->arg1 = packet->cmd;
+	       break;
+	    case PATO_CMD_PRINT_SETADDR:
+	       cmd = hd44780_print_set_addr(*(uint16_t*)&packet->arg0);
+	       reply->cmd = PATO_REPLY_OK;
+	       reply->arg0 = cmd;
+	       reply->arg1 = packet->cmd;
+	       break;
+	    case PATO_CMD_PRINT_GETADDR: {
+	       *(uint16_t*)&reply->arg0 = hd44780_print_get_addr();
+	       reply->cmd = PATO_REPLY_OK;
+	    } break;
+	    case PATO_CMD_PRINT_COMMIT:
+	       cmd = hd44780_print_commit();
+	       reply->cmd = PATO_REPLY_OK;
+	       reply->arg0 = cmd;
+	       reply->arg1 = packet->cmd;
+	       break;
+	    case PATO_CMD_PRINT_PUT:
+	       cmd = hd44780_print_put(packet->arg0, packet->arg1);
 	       reply->cmd = PATO_REPLY_OK;
 	       reply->arg0 = cmd;
 	       reply->arg1 = packet->cmd;
