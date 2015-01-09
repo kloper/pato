@@ -137,14 +137,48 @@ class Test(unittest.TestCase):
         self.reset_pato(pato)
 
         pato.execute(Cmd.PRINT_SETADDR, 0)
-        prefix = "Counter %08x\0"
-        str = prefix+int2str(0)
+        prefix = "Counter A %08x ****\n" \
+                 "Counter B %08x ----\n" \
+                 "Counter C %d $$$$\n" \
+                 "Total: %d\0"
+        str = prefix+int2str(0)+int2str(0)+int2str(0)+int2str(0)
         for pair in pairs(str):
             pato.execute(Cmd.PRINT_PUT, ord(pair[0]), ord(pair[1]))
 
-        for i in xrange(100):
-            pato.execute(Cmd.PRINT_SETADDR, len(prefix))
-            pato.execute(Cmd.PRINT_PUT, i & 0xff, (i >> 8) & 0xff) 
-            pato.execute(Cmd.PRINT_COMMIT)
-            time.sleep(1)
-        
+        for i in xrange(30):
+            for j in xrange(20):
+                for k in xrange(10):
+                    pato.execute(Cmd.PRINT_SETADDR, len(prefix))
+                    pato.execute(Cmd.PRINT_PUT, i & 0xff, (i >> 8) & 0xff)
+                    pato.execute(Cmd.PRINT_PUT, j & 0xff, (j >> 8) & 0xff)
+                    pato.execute(Cmd.PRINT_PUT, k & 0xff, (k >> 8) & 0xff)
+                    total = i + j + k
+                    pato.execute(Cmd.PRINT_PUT,
+                                 total & 0xff,
+                                 (total >> 8) & 0xff)
+                    pato.execute(Cmd.PRINT_COMMIT)
+                    # time.sleep(0.1)
+
+    def test_print_overrun(self):
+        pato = Pato(self.transport)
+
+        self.reset_pato(pato)
+
+        pato.execute(Cmd.PRINT_SETADDR, 0)
+        line1 = "Line #1\n" \
+                "Line #2\n" \
+                "Line #3\n" \
+                "Line #4\n" \
+                "Line #5\n\0"
+        line2 = "Line #6\n" \
+                "Line #7\n" \
+                "Line #8\n\0"
+        pato.execute(Cmd.PRINT_SETADDR, 0)
+        for pair in pairs(line1):
+            pato.execute(Cmd.PRINT_PUT, ord(pair[0]), ord(pair[1]))
+        pato.execute(Cmd.PRINT_COMMIT)
+        time.sleep(2)
+        pato.execute(Cmd.PRINT_SETADDR, 0)
+        for pair in pairs(line2):
+            pato.execute(Cmd.PRINT_PUT, ord(pair[0]), ord(pair[1]))
+        pato.execute(Cmd.PRINT_COMMIT)
