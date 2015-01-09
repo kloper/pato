@@ -137,7 +137,7 @@ class Test(unittest.TestCase):
         self.reset_pato(pato)
 
         pato.execute(Cmd.PRINT_SETADDR, 0)
-        prefix = "Counter A %08x ****\n" \
+        prefix = "\fCounter A %08x ****\n" \
                  "Counter B %08x ----\n" \
                  "Counter C %d $$$$\n" \
                  "Total: %d\0"
@@ -165,7 +165,7 @@ class Test(unittest.TestCase):
         self.reset_pato(pato)
 
         pato.execute(Cmd.PRINT_SETADDR, 0)
-        line1 = "Line #1\n" \
+        line1 = "\fLine #1\n" \
                 "Line #2\n" \
                 "Line #3\n" \
                 "Line #4\n" \
