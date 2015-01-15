@@ -40,8 +40,3 @@ class Error:
     CRC = 0x01
     BADCMD = 0x02
     BADARG = 0x03
-
-class ProtocolException(Exception):
-    def __init__(self, *args, **kwargs):
-        args += (kwargs,)
-        Exception.__init__(self, *args)
