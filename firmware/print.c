@@ -94,8 +94,7 @@ static tty_coord_t coord_add(tty_coord_t coord, int8_t dx, int8_t dy)
       coord.x -= width;
    while(coord.x < 0)
       coord.x += width;
-
-   
+  
    return coord;
 }
 
