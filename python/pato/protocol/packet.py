@@ -11,8 +11,8 @@ from collections import defaultdict
 
 from util.packet import PacketBase
 from util.protocol import ProtocolException
+from util.crc import crc8
 
-from pato.protocol.crc import crc8
 from pato.protocol import Reply as ReplyVal, Error
 
 class Request(PacketBase):
