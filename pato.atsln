@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Atmel Studio Solution File, Format Version 11.00
 Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "firmware", "firmware\firmware.cproj", "{7CA55CE5-68E7-46AF-83A3-BA83EF1502C0}"
 EndProject
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "bridge", "bridge\bridge.cproj", "{0E92C9E0-29E7-45E5-ADAC-545C6CD84675}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|AVR = Debug|AVR
@@ -13,6 +15,10 @@ Global
 		{7CA55CE5-68E7-46AF-83A3-BA83EF1502C0}.Debug|AVR.Build.0 = Debug|AVR
 		{7CA55CE5-68E7-46AF-83A3-BA83EF1502C0}.Release|AVR.ActiveCfg = Release|AVR
 		{7CA55CE5-68E7-46AF-83A3-BA83EF1502C0}.Release|AVR.Build.0 = Release|AVR
+		{0E92C9E0-29E7-45E5-ADAC-545C6CD84675}.Debug|AVR.ActiveCfg = Debug|AVR
+		{0E92C9E0-29E7-45E5-ADAC-545C6CD84675}.Debug|AVR.Build.0 = Debug|AVR
+		{0E92C9E0-29E7-45E5-ADAC-545C6CD84675}.Release|AVR.ActiveCfg = Release|AVR
+		{0E92C9E0-29E7-45E5-ADAC-545C6CD84675}.Release|AVR.Build.0 = Release|AVR
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
