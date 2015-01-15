@@ -2,7 +2,7 @@
  *
  * Copyright (c) Dimitry Kloper <kloper@users.sf.net> 2014-2015
  *
- * main.c - CCM2040 driver test program
+ * crc.c - 8-bit CRC calculation based on util/crc16.h
  *
  */
 
