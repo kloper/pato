@@ -91,13 +91,12 @@ void uart_init()
   UCSR0B = (1 << RXEN0)|(1 << TXEN0)|(1 << RXCIE0);
 }
 
-uint8_t uart_recv(uint8_t **bufferp)
+uint8_t uart_recv()
 {
    while(g_uart_inbuf[g_uart_inbuf_head]) {
       sleep_mode();
    }
 
-   *bufferp = g_uart_inbuf;
    return g_uart_inbuf_head;
 }
 
@@ -110,6 +109,11 @@ void uart_continue()
 void *uart_outbuf()
 {
    return g_uart_outbuf;
+}
+
+void *uart_inbuf()
+{
+   return g_uart_inbuf;
 }
 
 void uart_send()

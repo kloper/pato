@@ -21,9 +21,10 @@
 #define UART_APPROX_BAUD_RATE (F_CPU/16/(UART_UBRR+1))
 
 extern void uart_init(void);
-extern uint8_t uart_recv(uint8_t **bufferp);
+extern uint8_t uart_recv(void);
 extern void uart_continue(void);
 extern void *uart_outbuf(void);
+extern void *uart_inbuf(void);
 extern void uart_send(void);
 
 #endif /* _pato_bridge_uart_h_ */
