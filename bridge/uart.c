@@ -26,17 +26,13 @@ static uint8_t g_uart_outbuf[UART_OUTBUF_SIZE];
 
 ISR(USART_RX_vect)
 {
-   uint8_t ucsr = 0;
-   uint8_t udr = 0;
-   
    while( g_uart_inbuf[g_uart_inbuf_head] ) {
-      ucsr = UCSR0A;
-      udr = UDR0;
-      if ( (ucsr & ((1<<RXC0)|(1<<FE0)|(1<<DOR0)|(1<<UPE0))) == (1<<RXC0) ) {
-	 g_uart_inbuf[g_uart_inbuf_head] = udr;
-	 if( !udr ) break;
+      if ( (UCSR0A & ((1<<RXC0)|(1<<FE0)|(1<<DOR0)|(1<<UPE0))) == (1<<RXC0) ) {
+	 g_uart_inbuf[g_uart_inbuf_head] = UDR0;
+	 if( !g_uart_inbuf[g_uart_inbuf_head] ) break;
 	 if( ++g_uart_inbuf_head >= UART_INBUF_SIZE )
 	    g_uart_inbuf_head = 0;
+	 g_uart_inbuf[g_uart_inbuf_head] = 0xff;
       } else {
 	 break;
       }
