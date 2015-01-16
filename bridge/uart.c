@@ -116,8 +116,10 @@ void uart_send()
 {
    int i = 0;
 
-   for( i = 0; g_uart_outbuf[i] && i < sizeof(g_uart_outbuf); i++ ) {
+   for( i = 0; i < sizeof(g_uart_outbuf); i++ ) {
       while ((UCSR0A & (1 << UDRE0)) == 0);
-	 UDR0 = g_uart_outbuf[i];
+      UDR0 = g_uart_outbuf[i];
+      if( !g_uart_outbuf[i] )
+	 break;
    }
 }
