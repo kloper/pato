@@ -12,7 +12,6 @@ from util.protocol import ProtocolException
 
 def tree(): return defaultdict(tree)
 
-
 class PacketBase(object):
     @classmethod
     def register(cls, *args):
