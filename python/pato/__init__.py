@@ -2,12 +2,14 @@
 #
 # Copyright (c) Dimitry Kloper <kloper@users.sf.net> 2014-2015
 #
-# python/pato/protocol/__init__.py -- Pato driver
+# python/pato/__init__.py -- Pato driver
 #
+
+from util.protocol import ProtocolException
 
 from pato.protocol.request import Request
 from pato.protocol.reply import Reply
-from pato.protocol import Cmd, ProtocolException
+from pato.protocol import Cmd
 
 class Pato(object):
     def __init__(self, transport):
