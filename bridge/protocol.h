@@ -14,9 +14,13 @@
 
 #define PATO_BRIDGE_ERROR_COBS 1
 #define PATO_BRIDGE_ERROR_CRC 2
+#define PATO_BRIDGE_ERROR_BADCMD 3
+#define PATO_BRIDGE_ERROR_BADARG 4
+#define PATO_BRIDGE_ERROR_SIZE 5
 
 typedef struct _packet_header {
    uint8_t pad;
+   uint8_t size;
    uint16_t crc;
    uint8_t cmd;
 } packet_header_t;
