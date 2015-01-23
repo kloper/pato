@@ -16,6 +16,7 @@
 #include "uart.h"
 #include "cobs.h"
 #include "crc.h"
+#include "twi.h"
 
 int main(int argc, char *argv[])
 {
@@ -25,7 +26,8 @@ int main(int argc, char *argv[])
    uint8_t size = 0, error_code = 0;
    
    uart_init();
-
+   twi_init();
+   
    request = (packet_header_t*)uart_inbuf();
    reply = (packet_header_t*)uart_outbuf();
    request_body = (uint8_t*)request + sizeof(packet_header_t);
@@ -58,9 +60,67 @@ int main(int argc, char *argv[])
       
       switch(request->cmd) {
 	 case PATO_BRIDGE_CMD_PING: {
+	    if(request->size - sizeof(request->cmd) != sizeof(uint32_t)) {
+	       error_code = PATO_BRIDGE_ERROR_SIZE;
+	       goto error_label;
+	    }
+	    
 	    *(uint32_t*)reply_body = *(uint32_t*)request_body + 1;
 	    reply_last = reply_body + sizeof(uint32_t);
 	 } break;
+	 case PATO_BRIDGE_CMD_TWI_CONFIG: {
+	    if(request->size - sizeof(request->cmd) != sizeof(twi_config_t)) {
+	       error_code = PATO_BRIDGE_ERROR_SIZE;
+	       goto error_label;
+	    }
+
+	    twi_config(*(twi_config_t*)request_body);
+	    twi_init();
+
+	    reply_last = reply_body;
+	 } break;
+	 case PATO_BRIDGE_CMD_TWI_MASTER_SEND: {
+	    twi_master_send_args_t *args =
+	       (twi_master_send_args_t*)request_body;
+	    twi_wait_result_t *res =
+	       (twi_wait_result_t*)reply_body;
+	    
+	    if(request->size - sizeof(request->cmd) <
+	                                     sizeof(twi_master_send_args_t)) {
+	       error_code = PATO_BRIDGE_ERROR_SIZE;
+	       goto error_label;
+	    }
+
+	    args->addr <<= 1;
+	    twi_master_send((twi_packet_header_t*)&args->addr,
+			    request_last - (uint8_t*)&args->addr,
+			    args->stop);
+
+	    *res = twi_master_wait();
+	    reply_last = reply_body + sizeof(twi_wait_result_t);
+	 } break;
+	 case PATO_BRIDGE_CMD_TWI_MASTER_RECV: {
+	    twi_master_recv_args_t *args =
+	       (twi_master_recv_args_t*)request_body;
+	    twi_wait_result_t *res =
+	       (twi_wait_result_t*)reply_body;
+	    uint8_t *data = reply_body + sizeof(twi_wait_result_t) - 1;
+	    
+	    if(request->size - sizeof(request->cmd) <
+	                                     sizeof(twi_master_recv_args_t)) {
+	       error_code = PATO_BRIDGE_ERROR_SIZE;
+	       goto error_label;
+	    }
+
+	    data[0] = (args->addr << 1);
+	    
+	    twi_master_recv((twi_packet_header_t*)data,
+			    args->size+1, args->stop, args->last_nack);
+
+	    *res = twi_master_wait();
+	    reply_last = data +	1 + args->size - res->remaining;
+	 } break;
+
 	 default:
 	    error_code = PATO_BRIDGE_ERROR_BADCMD;
 	    goto error_label;
