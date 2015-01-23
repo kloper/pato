@@ -9,7 +9,7 @@ import pdb
 
 from collections import defaultdict
 
-from util.packet import PacketBase
+from util.packet import PacketBase, tree
 from util.protocol import ProtocolException
 from util.crc import crc8
 
