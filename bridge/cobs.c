@@ -18,6 +18,7 @@ uint8_t *cobs_encode(uint8_t *buffer, uint8_t size)
    uint8_t *code = buffer;
 
    buffer++;
+   size--;
    
    *code = 1;
    while(size--) {
