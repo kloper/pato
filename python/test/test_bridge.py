@@ -85,3 +85,35 @@ class Test(unittest.TestCase):
             rc = bridge.execute(Cmd.PING, i)
             self.logger.info("pong: {}".format(rc))
             self.assertTrue(rc == i+1)
+
+
+    def test_master_send(self):
+        bridge = Bridge(self.transport)
+        for i in xrange(1):
+            rc = bridge.execute(Cmd.TWI_MASTER_SEND, 0x50, [1], 1)
+            self.logger.info("sent: {}".format(rc))
+
+    def test_master_recv(self):
+        bridge = Bridge(self.transport)
+        for i in xrange(1):
+            rc = bridge.execute(Cmd.TWI_MASTER_RECV, 0x50, 10, 1, 1)
+            self.logger.info("received: {}".format(rc))
+
+    def test_at24c02_read(self):
+        bridge = Bridge(self.transport)
+        for addr in xrange(10):
+            rc = bridge.execute(Cmd.TWI_MASTER_SEND, 0x50, [addr], 0)
+            self.logger.info("sent: {}".format(rc))
+            self.assertTrue( rc[1] == 0, "Send failed")
+            size = 10
+            rc = bridge.execute(Cmd.TWI_MASTER_RECV, 0x50, size, 1, 1)
+            self.logger.info("received: {}".format(rc))
+            self.assertTrue( rc[1] == 0 and len(rc[2]) == size, "Send failed")
+
+    def test_at24c02_write(self):
+        bridge = Bridge(self.transport)
+        for addr in xrange(1):
+            rc = bridge.execute(Cmd.TWI_MASTER_SEND, 0x50,
+                                [addr, 0xeb, 0xfc], 1)
+            self.logger.info("sent: {}".format(rc))
+            
