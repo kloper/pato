@@ -25,4 +25,7 @@
 #define UART_DDR  PORTD
 #endif
 
+#define WDT_PRESCALE 0x5
+#define WDT_RETRIES 4
+
 #endif /* _pato_bridge_config_h_ */

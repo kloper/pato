@@ -15,6 +15,7 @@
 
 #include "config.h"
 #include "twi.h"
+#include "wdt.h"
 
 typedef struct _twi_state {
    uint8_t stop:1;
@@ -139,6 +140,8 @@ void twi_master_recv(twi_packet_header_t *data, uint8_t size,
 twi_wait_result_t twi_master_wait()
 {
    twi_wait_result_t rc;
+   uint8_t remaining = 0;
+   uint8_t retries = 0;
    
    do {
       cli();
@@ -146,10 +149,19 @@ twi_wait_result_t twi_master_wait()
       rc.remaining = g_twi_state.count;
       sei();
       
-      if(!rc.status) 
-	 sleep_mode();
-      else
-	 break;
+      if(rc.status) break;
+      if(remaining == rc.remaining) {
+	 if(retries >= WDT_RETRIES) break;
+      } else {
+	 retries = 0;
+	 remaining = rc.remaining;
+      }
+
+      wdt_enable(WDT_PRESCALE);
+      sleep_mode();
+      wdt_disable();	    
+      retries++;
+   
    } while(1);
 
    return rc;
