@@ -71,7 +71,7 @@ class Test(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.logger = logging.getLogger('default')
-        cls.transport = serial.Serial(port = 'COM83',
+        cls.transport = serial.Serial(port = 'COM9',
                                       baudrate = 57600,
                                       timeout = 10)
 
@@ -108,7 +108,7 @@ class Test(unittest.TestCase):
             size = 10
             rc = bridge.execute(Cmd.TWI_MASTER_RECV, 0x50, size, 1, 1)
             self.logger.info("received: {}".format(rc))
-            self.assertTrue( rc[1] == 0 and len(rc[2]) == size, "Send failed")
+            self.assertTrue( rc[1] == 0 and len(rc[2]) == size, "Recv failed")
 
     def test_at24c02_write(self):
         bridge = Bridge(self.transport)
