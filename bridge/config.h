@@ -9,18 +9,18 @@
 #ifndef _pato_bridge_config_h_
 #define _pato_bridge_config_h_
 
-#ifdef __AVR_ATmega2560__
+#if defined(__AVR_ATmega2560__)
 #define F_CPU 16000000
 #define UART_PORT PORTE
 #define UART_DDR  PORTE
 #endif
-#ifdef __AVR_ATtiny2313__
-#define F_CPU 8000000
+#if defined(__AVR_ATmega328P__)
+#define F_CPU 16000000
 #define UART_PORT PORTD
 #define UART_DDR  PORTD
 #endif
-#ifdef __AVR_ATmega328P__
-#define F_CPU 8000000
+#if defined(__AVR_ATmega328__)
+#define F_CPU 3686400
 #define UART_PORT PORTD
 #define UART_DDR  PORTD
 #endif
