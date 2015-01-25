@@ -31,9 +31,9 @@ class Reply(PacketBase):
     Registry = tree()
     
     @classmethod
-    def parse(cls, packet):        
+    def parse(cls, packet):
         cls.assertTrue( packet[-1] == 0 and min(packet[:-1]) > 0,
-                        "Packet is not COBS encoded" )
+                        "Packet is not COBS encoded: {}".format(packet) )
 
         packet = cobs.decode(packet)
         size = packet[0]
