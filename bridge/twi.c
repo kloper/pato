@@ -151,7 +151,14 @@ twi_wait_result_t twi_master_wait()
       
       if(rc.status) break;
       if(remaining == rc.remaining) {
-	 if(retries >= WDT_RETRIES) break;
+	 if(retries >= WDT_RETRIES) {
+	    if(g_twi_state.stop) {
+	       TWCR = (1<<TWINT) | (1<<TWEN) | (1<<TWSTO) | (1<<TWIE);
+	    } else {
+	       TWCR = (1<<TWEN);
+	    }	    
+	    break;
+	 }
       } else {
 	 retries = 0;
 	 remaining = rc.remaining;
@@ -161,7 +168,6 @@ twi_wait_result_t twi_master_wait()
       sleep_mode();
       wdt_disable();	    
       retries++;
-   
    } while(1);
 
    return rc;
