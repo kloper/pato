@@ -27,4 +27,7 @@ extern uint8_t EEMEM tty_height;
 extern uint8_t EEMEM tty_linemap[8];
 extern uint8_t EEMEM tty_policy;
 
+extern uint32_t EEMEM twi_baudrate;
+extern uint8_t EEMEM twi_slaveaddr;
+
 #endif /* _pato_config_h_ */
