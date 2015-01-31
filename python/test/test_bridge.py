@@ -86,7 +86,6 @@ class Test(unittest.TestCase):
             self.logger.info("pong: {}".format(rc))
             self.assertTrue(rc == i+1)
 
-
     def test_master_send(self):
         bridge = Bridge(self.transport)
         for i in xrange(1):
@@ -116,4 +115,15 @@ class Test(unittest.TestCase):
             rc = bridge.execute(Cmd.TWI_MASTER_SEND, 0x50,
                                 [addr, 0xeb, 0xfc], 1)
             self.logger.info("sent: {}".format(rc))
-            
+
+    def test_pato_ping(self):
+        bridge = Bridge(self.transport)
+
+        rc = bridge.execute(Cmd.TWI_MASTER_SEND, 0x41,
+                            [0, 0, 0, 0, 0], 0)
+        self.logger.info("sent: {}".format(rc))
+
+        rc = bridge.execute(Cmd.TWI_MASTER_RECV, 0x41, 5, 1, 1)
+        self.logger.info("received: {}".format(rc))
+        #self.assertTrue( rc[1] == 0 and len(rc[2]) == size, "Recv failed")
+
