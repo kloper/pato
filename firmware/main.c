@@ -16,15 +16,30 @@
 #include "protocol.h"
 #include "hd44780.h"
 #include "uart.h"
+#include "twi.h"
 #include "crc.h"
 #include "print.h"
+
+#if defined(HAVE_UART)
+#define comm_init uart_init
+#define comm_outbuf uart_outbuf
+#define comm_recv uart_recv
+#define comm_send uart_send
+#elif defined(HAVE_TWI)
+#define comm_init twi_init
+#define comm_outbuf twi_outbuf
+#define comm_recv twi_slave_recv
+#define comm_send twi_slave_send
+#else
+#error "No communication interface has been configured"
+#endif
 
 int main(int argc, char *argv[])
 {
    packet_t *packet = NULL, *reply = NULL;
    uint8_t reset_value = 0, cmd = 0;
    
-   uart_init();
+   comm_init();
 
    reset_value = eeprom_read_byte(&hd44780_initfunc);
 
@@ -42,10 +57,10 @@ int main(int argc, char *argv[])
 
    sei();
 
-   reply = (packet_t*)uart_outbuf();
+   reply = (packet_t*)comm_outbuf();
    
    while(1) {
-      packet = uart_recv();
+      packet = comm_recv();
 
       if( packet->crc != crc8( (uint8_t*)packet, sizeof(packet_t) - 2) ) {
 	 reply->cmd = PATO_REPLY_ERROR;
@@ -160,7 +175,7 @@ int main(int argc, char *argv[])
       reply->crc = crc8( (uint8_t*)reply, sizeof(packet_t) - 2);
       reply->zero = 0;
 
-      uart_send();
+      comm_send();
 
    }
    return 0;

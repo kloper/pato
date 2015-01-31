@@ -19,6 +19,8 @@
 #include "uart.h"
 #include "timeout.h"
 
+#if defined(HAVE_UART)
+
 uint8_t g_uart_inbuf_head = 0;
 uint8_t g_uart_inbuf[UART_INBUF_SIZE];
 uint8_t g_uart_outbuf[UART_OUTBUF_SIZE];
@@ -147,3 +149,5 @@ void uart_send()
       UDR0 = g_uart_outbuf[i];
    }
 }
+
+#endif /* HAVE_UART */

@@ -11,7 +11,10 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
+#include "config.h"
 #include "uart.h"
+
+#if defined(HAVE_UART)
 	
 	.text	
 
@@ -79,4 +82,4 @@ uart_isr_exit:
 	reti
 	.endfunc
 
-	
+#endif /* HAVE_UART */

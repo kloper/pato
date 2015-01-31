@@ -18,6 +18,8 @@
 #include "protocol.h"
 #include "twi.h"
 
+#if defined(HAVE_TWI)
+
 typedef struct _twi_state {
    uint8_t index;
    uint8_t data[sizeof(packet_t)];
@@ -135,3 +137,5 @@ void *twi_outbuf()
 {
    return g_twi_output.data;
 }
+
+#endif /* HAVE_TWI */

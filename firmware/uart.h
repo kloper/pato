@@ -8,6 +8,7 @@
 
 #ifndef _pato_uart_h_
 #define _pato_uart_h_
+#if defined(HAVE_UART)
 
 #define UART_INBUF_SIZE 5
 #define UART_OUTBUF_SIZE 5
@@ -23,4 +24,5 @@ extern void *uart_outbuf(void);
 
 #endif /* __ASSEMBLY__ */
 
+#endif /* HAVE_UART */
 #endif /* _pato_uart_h_ */
