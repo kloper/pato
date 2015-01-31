@@ -44,7 +44,7 @@ ISR(TWI_vect)
 volatile uint8_t twsr, twcr;
    twsr = TWSR & 0xF8;
    
-   twcr = (1<<TWEN) | (1<<TWIE);
+   twcr = (1<<TWINT) | (1<<TWEN) | (1<<TWIE);
    
    switch(twsr) {
       case 0xA8:
@@ -60,12 +60,19 @@ volatile uint8_t twsr, twcr;
 	 break;
       case 0x60:	 
       case 0x68:
-	 g_twi_input.index = 0;	 
+	 g_twi_input.index = 0;
+	 twcr |= (1<<TWEA);
+	 break;
       case 0x80:
 	 if(g_twi_input.index < sizeof(packet_t))
 	    g_twi_input.data[g_twi_input.index++] = TWDR;
 	 if(g_twi_input.index < sizeof(packet_t))
 	    twcr |= (1<<TWEA);
+	 break;
+      case 0:
+	 twcr |= (1<<TWEA) | (1<<TWSTO);
+      default:
+	 twcr |= (1<<TWEA);
 	 break;
    }
 
@@ -87,7 +94,7 @@ void twi_init()
    TWAR = twar << 1;   
    TWSR = twsr & 0x3;
    TWBR = twbr & 0xff;
-   TWCR = (1<<TWEA)|(1<<TWEN);
+   TWCR = (1<<TWINT) | (1<<TWEA) | (1<<TWEN) | (1<<TWIE);
 }
 
 static void twi_slave_wait(twi_state_t *state)
@@ -114,7 +121,7 @@ void twi_slave_send()
    g_twi_output.index = 0;
    sei();
 
-   TWCR = (1<<TWEA)|(1<<TWEN);
+   TWCR = (1<<TWINT) | (1<<TWEA) | (1<<TWEN) | (1<<TWIE);
 
    twi_slave_wait(&g_twi_output);
 }
@@ -126,7 +133,7 @@ packet_t *twi_slave_recv()
    g_twi_input.index = 0;
    sei();
 
-   TWCR = (1<<TWEA)|(1<<TWEN);
+   TWCR = (1<<TWINT) | (1<<TWEA) | (1<<TWEN) | (1<<TWIE);
 
    twi_slave_wait(&g_twi_input);
 
