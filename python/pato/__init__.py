@@ -29,17 +29,9 @@ class Pato(object):
             "Can't find reply template for command : {}".format(cmd)
 
         request = request_class.compile(*args, **kwargs)
-        bytes_written = self.transport.write("".join(chr(c) for c in request))
+        reply = self.transport.query(request)
 
-        if bytes_written != len(request):
-            raise ProtocolException("Failed to send request")
-        
-        reply_size = 5
-        reply = self.transport.read(reply_size)
-        if len(reply) != reply_size:
-            raise ProtocolException("Failed to receive reply")
-        
-        result = reply_class.parse([ord(c) for c in reply])
+        result = reply_class.parse(reply)
 
         return result
                                                 
