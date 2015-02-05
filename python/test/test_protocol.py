@@ -13,6 +13,7 @@ import traceback
 import datetime
 import time
 import serial
+import math
 
 import logging
 import logging.config
@@ -22,7 +23,11 @@ sys.path.append( os.path.join( localdir, '..') );
 
 from pato import Pato
 from pato.protocol import Cmd, Direct
+from pato.transport.uart import Uart
+from pato.transport.bridge import Bridge, ProtocolException
 
+from bridge.protocol import Cmd as BridgeCmd
+    
 logging.config.dictConfig( 
     { 'version': 1,              
       'disable_existing_loggers': True,
@@ -71,23 +76,12 @@ def int2str(val, size = 2):
         val >>= 8
     return "".join(chr(c) for c in reversed(res))
 
-
-class Test(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.logger = logging.getLogger('default')
-        cls.transport = serial.Serial(port = 'COM83',
-                                      baudrate = 9600,
-                                      timeout = 10)
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.transport.close()                
-    
+class NullTest(unittest.TestCase):    
     def test_ping(self):
         pato = Pato(self.transport)
-        rc = pato.execute(Cmd.PING, 0)
-        self.assertTrue(rc == 1)
+        for i in xrange(10000):
+            rc = pato.execute(Cmd.PING, i & 0xff)
+            self.assertTrue(rc == (i + 1) & 0xff )
 
     def test_write(self):
         pato = Pato(self.transport)
@@ -157,7 +151,7 @@ class Test(unittest.TestCase):
                                  total & 0xff,
                                  (total >> 8) & 0xff)
                     pato.execute(Cmd.PRINT_COMMIT)
-                    # time.sleep(0.1)
+                    
 
     def test_print_overrun(self):
         pato = Pato(self.transport)
@@ -182,3 +176,107 @@ class Test(unittest.TestCase):
         for pair in pairs(line2):
             pato.execute(Cmd.PRINT_PUT, ord(pair[0]), ord(pair[1]))
         pato.execute(Cmd.PRINT_COMMIT)
+
+class UartTransport(NullTest):
+    @classmethod
+    def setUpClass(cls):
+        cls.logger = logging.getLogger('default')
+        cls.transport = Uart(port = 'COM83',
+                             baudrate = 9600,
+                             timeout = 10)
+        
+    @classmethod
+    def tearDownClass(cls):
+        cls.transport.close()                
+
+class BridgeTransport(NullTest):
+    @classmethod
+    def setUpClass(cls):
+        cls.logger = logging.getLogger('default')
+        cls.transport = Bridge(slave_addr = 0x41,
+                               port = 'COM9',
+                               baudrate = 57600,
+                               timeout = 10)
+        cls.query_method = cls.transport.query
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.transport.close()                
+
+    def tearDown(self):
+        self.transport.query =  self.query_method
+        
+    def out_of_sync_query(self, request):
+        (status, remaining) = self.transport.bridge.execute(
+            BridgeCmd.TWI_MASTER_SEND,
+            self.transport.slave_addr,
+            request,
+            0)
+        
+        assert remaining == 0, "Failed to send req #1"
+        (status, remaining) = self.transport.bridge.execute(
+            BridgeCmd.TWI_MASTER_SEND,
+            self.transport.slave_addr,
+            request,
+            0)
+
+        assert remaining != 0, "Req #2 succeeded while shouldn't"
+        
+        (status, remaining) = self.transport.bridge.execute(
+            BridgeCmd.TWI_MASTER_SEND,
+            self.transport.slave_addr,
+            request,
+            0)
+
+        assert remaining != 0, "Req #3 succeeded while shouldn't"
+        
+        time.sleep(0.3)
+        (status, remaining, reply) = self.transport.bridge.execute(
+            BridgeCmd.TWI_MASTER_RECV,
+            self.transport.slave_addr,
+            5, 1, 1)
+
+        assert remaining == 0, "Failed to receive reply #1"
+
+        (status, remaining, reply2) = self.transport.bridge.execute(
+            BridgeCmd.TWI_MASTER_RECV,
+            self.transport.slave_addr,
+            5, 1, 1)
+
+        assert remaining == 0, "Failed to receive reply #2"
+        assert sum(reply2) == 0, "Reply #2 has non-zero bytes"
+        
+        return reply
+
+    def short_packet_query(self, request):
+        if not hasattr(self, 'count'):
+            setattr(self, 'count', 0)
+
+        self.count += 1
+        
+        (status, remaining) = self.transport.bridge.execute(
+            BridgeCmd.TWI_MASTER_SEND,
+            self.transport.slave_addr,
+            request[0:(self.count % 5)] + [5]*(self.count%10),
+            0)
+
+        time.sleep(0.3)
+        (status, remaining, reply) = self.transport.bridge.execute(
+            BridgeCmd.TWI_MASTER_RECV,
+            self.transport.slave_addr,
+            5, 1, 1)
+
+        return reply
+
+    def test_unsync_ping(self):
+        self.transport.query = self.out_of_sync_query
+        return self.test_ping()
+
+    def test_short_ping(self):        
+        self.transport.query = self.short_packet_query
+
+        pato = Pato(self.transport)
+        for i in xrange(10000):
+            self.assertRaises(ProtocolException,
+                              pato.execute, Cmd.PING, i & 0xff)
+    
