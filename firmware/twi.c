@@ -28,16 +28,21 @@ typedef struct _twi_state {
 
 
 twi_state_t g_twi_input = {
-   .index = 0,
+   .index = 5,
    .data = {0, 0, 0, 0, 0},
    .status = 0xff
 };
 
 twi_state_t g_twi_output = {
-   .index = 0,
+   .index = 5,
    .data = {0, 0, 0, 0, 0},
    .status = 0xff
 };
+
+#ifdef DEBUG_TWI
+uint8_t g_twi_states[10];
+uint8_t g_twi_states_cur = 0;
+#endif /* DEBUG_TWI */
 
 ISR(TWI_vect)
 {
@@ -45,23 +50,32 @@ volatile uint8_t twsr, twcr;
    twsr = TWSR & 0xF8;
    
    twcr = (1<<TWINT) | (1<<TWEN) | (1<<TWIE);
-   
+
+#ifdef DEBUG_TWI
+   g_twi_states[g_twi_states_cur++] = twsr;
+   if(g_twi_states_cur >= sizeof(g_twi_states))
+      g_twi_states_cur = 0;
+#endif /* DEBUG_TWI */
+  
    switch(twsr) {
       case 0xA8:
       case 0xB0:
-	    g_twi_output.index = 0; 
       case 0xB8:
-	 if(g_twi_output.index < sizeof(packet_t))
+	 if( g_twi_output.index < sizeof(packet_t) )
 	    TWDR = g_twi_output.data[g_twi_output.index++];
 	 else
 	    TWDR = 0;
-	 if(g_twi_output.index < sizeof(packet_t))
-	    twcr |= (1<<TWEA);
+	 twcr |= (1<<TWEA);
+	 break;
+      case 0xC0:
+      case 0xC8:
+	 g_twi_output.status = twsr;
+	 twcr |= (1<<TWEA);
 	 break;
       case 0x60:	 
       case 0x68:
-	 g_twi_input.index = 0;
-	 twcr |= (1<<TWEA);
+	 if(g_twi_input.index < sizeof(packet_t))
+	    twcr |= (1<<TWEA);
 	 break;
       case 0x80:
 	 if(g_twi_input.index < sizeof(packet_t))
@@ -69,11 +83,17 @@ volatile uint8_t twsr, twcr;
 	 if(g_twi_input.index < sizeof(packet_t))
 	    twcr |= (1<<TWEA);
 	 break;
+      case 0x88: 
+      case 0xA0:	 
+	 g_twi_input.status = twcr;
+	 twcr |= (1<<TWEA);	 
+	 break;	 
       case 0:
 	 twcr |= (1<<TWEA) | (1<<TWSTO);
-      default:
-	 twcr |= (1<<TWEA);
+	 g_twi_input.status = 0xff;
+	 g_twi_output.status = 0xff;
 	 break;
+
    }
 
    TWCR = twcr;
@@ -99,15 +119,14 @@ void twi_init()
 
 static void twi_slave_wait(twi_state_t *state)
 {
-   uint8_t index = 0;
+   uint8_t status = 0;
 
    do {
       cli();
-      index = state->index;
+      status = state->status;
       sei();
 
-      if(index >= sizeof(state->data))
-	 break;
+      if(status) break;
 	 
       sleep_mode();
 
@@ -124,6 +143,8 @@ void twi_slave_send()
    TWCR = (1<<TWINT) | (1<<TWEA) | (1<<TWEN) | (1<<TWIE);
 
    twi_slave_wait(&g_twi_output);
+
+   TWCR = (1<<TWEN) | (1<<TWIE);
 }
 
 packet_t *twi_slave_recv()
@@ -131,12 +152,15 @@ packet_t *twi_slave_recv()
    cli();
    g_twi_input.status = 0;
    g_twi_input.index = 0;
+   g_twi_input.data[sizeof(packet_t)-1] = 0xff;
    sei();
 
    TWCR = (1<<TWINT) | (1<<TWEA) | (1<<TWEN) | (1<<TWIE);
 
    twi_slave_wait(&g_twi_input);
 
+   TWCR = (1<<TWEN) | (1<<TWIE);
+   
    return (packet_t*)g_twi_input.data;
 }
 
