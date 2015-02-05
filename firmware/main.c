@@ -62,7 +62,11 @@ int main(int argc, char *argv[])
    while(1) {
       packet = comm_recv();
 
-      if( packet->crc != crc8( (uint8_t*)packet, sizeof(packet_t) - 2) ) {
+      if( packet->zero != 0 ) {
+	 reply->cmd = PATO_REPLY_ERROR;
+	 reply->arg0 = PATO_ERROR_SEP;
+	 reply->arg1 = packet->cmd;
+      } else if(packet->crc != crc8( (uint8_t*)packet, sizeof(packet_t) - 2)) {
 	 reply->cmd = PATO_REPLY_ERROR;
 	 reply->arg0 = PATO_ERROR_CRC;
 	 reply->arg1 = packet->cmd;

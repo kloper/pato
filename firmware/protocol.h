@@ -37,6 +37,7 @@
 #define PATO_ERROR_CRC    0x01
 #define PATO_ERROR_BADCMD 0x02
 #define PATO_ERROR_BADARG 0x03
+#define PATO_ERROR_SEP    0x04
 
 typedef struct _packet {
    uint8_t cmd;
