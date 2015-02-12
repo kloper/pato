@@ -12,3 +12,6 @@ core
 cscope.out
 *.pyc
 *.log
+*/Debug/*
+*/.backup/*
+*.atsuo
