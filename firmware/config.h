@@ -46,6 +46,9 @@
 #ifdef __AVR_ATtiny2313__
 #define F_CPU 8000000
 #endif
+#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega328__)
+#define F_CPU 16000000
+#endif
 
 #undef HAVE_UART 
 #define HAVE_TWI
