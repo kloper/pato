@@ -101,7 +101,7 @@ data_ddr_in:
 	ret
 	.endfunc
 
-	.func data_ddr_in
+	.func data_ddr_out
 data_ddr_out:	
 	sbi HD44780_DATA_DDR, HD44780_DB4
 	sbi HD44780_DATA_DDR, HD44780_DB5
@@ -151,21 +151,32 @@ hd44780_reset:
 	brne 10f
 	ret
 
-10:	
+10:
+        ;; set reset pin up, wait till HD44780 completes boot
 	delay 0xff
 	sbi HD44780_CTRL_OUT, HD44780_RST
 	mov r25, r24
 	call hd44780_wait_busy
 
+        ;; Power-on initialization, switching from 8-bit to 4-bit mode.
+        ;; See [HD44780 Data-sheet](http://tinyurl.com/qxfogu9) see
+        ;; "Initializing by Instruction" section Table 12
+        
+        ;; r24 (input param) is supposed to be loaded with FUNC_SET command
+        ;; with 4-bit mode enabled. 
 	mov r24, r25	
 	swap r24
 	call nibble_out
 	delay 0x8
 
+        ;; recover r24 again and send full command
 	mov r24, r25
 	call hd44780_ir_write
 	call hd44780_wait_busy
 
+        ;; recover r24 again and send full command again
+        ;; @bug I am not sure why this is needed, but somethimes display
+        ;; wouldn't enter 2-line mode without the second invocation.
 	mov r24, r25
 	call hd44780_ir_write
 	call hd44780_wait_busy
