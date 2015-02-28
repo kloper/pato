@@ -43,6 +43,16 @@
 
 #include "crc.h"
 
+/**
+ * @brief Simple calculation of crc8 of byte array.
+ * 
+ * Use _crc_ibutton_update() function found in Atmel's util/crc16.h to
+ * calculate CRC of byte array.
+ * 
+ * @param[in] ptr pointer to a byte array. Must not be NULL.
+ * @param[in] length of the byte array.
+ * @returns crc8 of the byte array
+ */
 uint8_t crc8(uint8_t *ptr, uint16_t size)
 {
    uint8_t crc = 0;

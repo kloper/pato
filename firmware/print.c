@@ -1,7 +1,7 @@
 /** -*- C -*-
  * \file
  *
- * \brief printf functionality for Pato
+ * \brief Output buffering, delta update and string formatting.
  *
  * Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>. 
  * All rights reserved.
