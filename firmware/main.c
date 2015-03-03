@@ -65,6 +65,36 @@
 #error "No communication interface has been configured"
 #endif
 
+#if defined(DEBUG)
+#define INCR_COUNTER_RECV g_counters.recv_count++
+#define INCR_COUNTER_SEND g_counters.send_count++
+#define INCR_ERROR_SEP    g_counters.error_sep_count++
+#define INCR_ERROR_CRC    g_counters.error_crc_count++
+#define INCR_ERROR_OTHER  g_counters.error_other_count++
+
+typedef struct _counters {
+   uint32_t recv_count;
+   uint32_t send_count;
+   uint32_t error_sep_count;
+   uint32_t error_crc_count;
+   uint32_t error_other_count;
+} counters_t;
+
+counters_t g_counters = {
+   .recv_count = 0,
+   .send_count = 0,
+   .error_sep_count = 0,
+   .error_crc_count = 0,
+   .error_other_count = 0
+};
+#else
+#define INCR_COUNTER_RECV 
+#define INCR_COUNTER_SEND 
+#define INCR_ERROR_SEP    
+#define INCR_ERROR_CRC    
+#define INCR_ERROR_OTHER  
+#endif /* DEBUG */
+
 int main(int argc, char *argv[])
 {
    packet_t *packet = NULL, *reply = NULL;
@@ -92,15 +122,18 @@ int main(int argc, char *argv[])
    
    while(1) {
       packet = comm_recv();
-
+      INCR_COUNTER_RECV;
+      
       if( packet->zero != 0 ) {
 	 reply->cmd = PATO_REPLY_ERROR;
 	 reply->arg0 = PATO_ERROR_SEP;
 	 reply->arg1 = packet->cmd;
+         INCR_ERROR_SEP;
       } else if(packet->crc != crc8( (uint8_t*)packet, sizeof(packet_t) - 2)) {
 	 reply->cmd = PATO_REPLY_ERROR;
 	 reply->arg0 = PATO_ERROR_CRC;
 	 reply->arg1 = packet->cmd;
+         INCR_ERROR_CRC;
       } else {
 	 switch(packet->cmd) {
 	    case PATO_CMD_PING:
@@ -157,6 +190,7 @@ int main(int argc, char *argv[])
 		  reply->cmd = PATO_REPLY_ERROR;
 		  reply->arg0 = PATO_ERROR_BADARG;
 		  reply->arg1 = packet->cmd;
+                  INCR_ERROR_OTHER;
 	       }
 	       break;
 	    case PATO_CMD_RESET:
@@ -203,6 +237,7 @@ int main(int argc, char *argv[])
 	       reply->cmd = PATO_REPLY_ERROR;
 	       reply->arg0 = PATO_ERROR_BADCMD;
 	       reply->arg1 = packet->cmd;
+               INCR_ERROR_OTHER;
 	       break;
 	 }
       }
@@ -211,7 +246,7 @@ int main(int argc, char *argv[])
       reply->zero = 0;
 
       comm_send();
-
+      INCR_COUNTER_SEND;
    }
    return 0;
 }
