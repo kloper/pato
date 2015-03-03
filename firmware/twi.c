@@ -116,7 +116,7 @@ volatile uint8_t twsr, twcr;
 	 break;
       case 0x88: 
       case 0xA0:	 
-	 g_twi_input.status = twcr;
+	 g_twi_input.status = twsr;
 	 twcr |= (1<<TWEA);	 
 	 break;	 
       case 0:
