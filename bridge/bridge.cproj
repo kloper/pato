@@ -5,7 +5,7 @@
     <ProjectVersion>6.2</ProjectVersion>
     <ToolchainName>com.Atmel.AVRGCC8.C</ToolchainName>
     <ProjectGuid>{0e92c9e0-29e7-45e5-adac-545c6cd84675}</ProjectGuid>
-    <avrdevice>ATmega328</avrdevice>
+    <avrdevice>ATmega328P</avrdevice>
     <avrdeviceseries>none</avrdeviceseries>
     <OutputType>Executable</OutputType>
     <Language>C</Language>
@@ -37,15 +37,14 @@
         </dependencies>
       </framework-data>
     </AsfFrameworkConfig>
-    <avrtool>
-    </avrtool>
+    <avrtool>com.atmel.avrdbg.tool.atmelice</avrtool>
     <com_atmel_avrdbg_tool_atmelice>
       <ToolOptions>
         <InterfaceProperties>
           <JtagEnableExtResetOnStartSession>false</JtagEnableExtResetOnStartSession>
           <JtagDbgClock>200000</JtagDbgClock>
           <IspClock>125000</IspClock>
-          <DebugWireClockDiv>32000</DebugWireClockDiv>
+          <DebugWireClockDiv>0</DebugWireClockDiv>
           <PdiClock>4000000</PdiClock>
         </InterfaceProperties>
         <InterfaceName>debugWIRE</InterfaceName>
