@@ -51,11 +51,11 @@
 
 int main(int argc, char *argv[])
 {
-   packet_header_t *request = NULL,  *reply = NULL;
+   packet_header_t * volatile request = NULL,  * volatile reply = NULL;
    uint8_t *request_last = NULL, *reply_last = NULL,
 	   *request_body = NULL, *reply_body = NULL;
    uint8_t size = 0, error_code = 0;
-   
+
    uart_init();
    twi_init();
    
