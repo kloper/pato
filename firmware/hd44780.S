@@ -69,26 +69,24 @@
 	.func nibble_out
 nibble_out:	
 	sbi HD44780_CTRL_OUT, HD44780_EN
-	delay 6
+        nop
 	bit_out r24, 0, HD44780_DB4
 	bit_out r24, 1, HD44780_DB5
 	bit_out r24, 2, HD44780_DB6
 	bit_out r24, 3, HD44780_DB7
 	cbi HD44780_CTRL_OUT, HD44780_EN
-	delay 8
 	ret
 	.endfunc
 
 	.func nibble_in
 nibble_in:	
 	sbi HD44780_CTRL_OUT, HD44780_EN
-	delay 6
+        nop
 	bit_in r24, HD44780_DB7
 	bit_in r24, HD44780_DB6
 	bit_in r24, HD44780_DB5
 	bit_in r24, HD44780_DB4
 	cbi HD44780_CTRL_OUT, HD44780_EN
-	delay 8
 	ret
 	.endfunc
 	
@@ -203,7 +201,7 @@ hd44780_wait_busy:
 	call byte_in
 	sbrc r24, 7
 	rjmp 10b
-	
+
 	ret
 	.endfunc
 	
