@@ -56,11 +56,13 @@
 #define comm_outbuf uart_outbuf
 #define comm_recv uart_recv
 #define comm_send uart_send
+#define comm_skip
 #elif defined(HAVE_TWI)
 #define comm_init twi_init
 #define comm_outbuf twi_outbuf
 #define comm_recv twi_slave_recv
 #define comm_send twi_slave_send
+#define comm_skip twi_slave_skip
 #else
 #error "No communication interface has been configured"
 #endif
@@ -119,7 +121,7 @@ int main(int argc, char *argv[])
    sei();
 
    reply = (packet_t*)comm_outbuf();
-   
+
    while(1) {
       packet = comm_recv();
       INCR_COUNTER_RECV;
@@ -247,6 +249,8 @@ int main(int argc, char *argv[])
       reply->crc = crc8( (uint8_t*)reply, sizeof(packet_t) - 2);
       reply->zero = 0;
 
+
+      comm_skip();
       comm_send();
       INCR_COUNTER_SEND;
    }

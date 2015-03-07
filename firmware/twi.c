@@ -113,6 +113,10 @@ volatile uint8_t twsr, twcr;
 	    g_twi_input.data[g_twi_input.index++] = TWDR;
 	 if(g_twi_input.index < sizeof(packet_t))
 	    twcr |= (1<<TWEA);
+         else {
+            g_twi_input.status = twsr;
+            twcr &= ~(1<<TWINT);
+         }
 	 break;
       case 0x88: 
       case 0xA0:	 
@@ -193,6 +197,25 @@ packet_t *twi_slave_recv()
    TWCR = (1<<TWEN) | (1<<TWIE);
    
    return (packet_t*)g_twi_input.data;
+}
+
+/**
+ * @brief Skip any pending input bytes 
+ */
+void twi_slave_skip()
+{
+   if( g_twi_input.status == 0xa0 || g_twi_input.status == 0xff)
+      return;
+   
+   cli();
+   g_twi_input.status = 0;
+   sei();
+
+   TWCR = (1<<TWINT) | (1<<TWEA) | (1<<TWEN) | (1<<TWIE);
+
+   twi_slave_wait(&g_twi_input);
+
+   TWCR = (1<<TWEN) | (1<<TWIE);
 }
 
 void *twi_outbuf()

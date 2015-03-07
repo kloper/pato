@@ -45,6 +45,7 @@ extern void twi_init(void);
 extern void twi_slave_send(void);
 extern packet_t *twi_slave_recv(void);
 extern void *twi_outbuf(void);
+extern void twi_slave_skip(void);
 
 #endif /* HAVE_TWI */
 #endif /* _pato_twi_h_ */
