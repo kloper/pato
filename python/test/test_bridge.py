@@ -54,6 +54,7 @@ sys.path.append( os.path.join( localdir, '..') );
 
 from bridge import Bridge
 from bridge.protocol import Cmd, Error
+from util.protocol import ProtocolException
 
 logging.config.dictConfig( 
     { 'version': 1,              
@@ -103,9 +104,9 @@ class Test(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.logger = logging.getLogger('default')
-        cls.transport = serial.Serial(port = 'COM9',
+        cls.transport = serial.Serial(port = 'COM97',
                                       baudrate = 57600,
-                                      timeout = 10)
+                                      timeout = 1)
 
     @classmethod
     def tearDownClass(cls):
@@ -114,9 +115,12 @@ class Test(unittest.TestCase):
     def test_ping(self):
         bridge = Bridge(self.transport)
         for i in xrange(10000):
-            rc = bridge.execute(Cmd.PING, i)
-            self.logger.info("pong: {}".format(rc))
-            self.assertTrue(rc == i+1)
+            try:
+                rc = bridge.execute(Cmd.PING, i)
+                self.logger.info("pong: {}".format(rc))
+                self.assertTrue(rc == i+1)
+            except ProtocolException as ex:
+                self.logger.warning("exception: {}".format(ex))
 
     def test_master_send(self):
         bridge = Bridge(self.transport)
