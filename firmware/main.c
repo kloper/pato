@@ -206,7 +206,9 @@ int main(int argc, char *argv[])
 		     cmd = reset_value;
 		     break;
 	       }
+               cli();
 	       hd44780_reset(cmd);
+               sei();
 	       reply->cmd = PATO_REPLY_OK;
 	       reply->arg0 = cmd;
 	       reply->arg1 = packet->cmd;
