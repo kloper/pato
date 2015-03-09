@@ -39,8 +39,13 @@
 
 #include <string.h>
 #include <stdint.h>
+
+#if defined(HAVE_PRINTF)
 #include <stdio.h>
-#include <stdarg.h>
+#else
+typedef char FILE;
+#define FDEV_SETUP_STREAM(a,b,c) 0
+#endif
 
 #include <avr/eeprom.h>
 
@@ -208,7 +213,7 @@ static int hd44780_putchar(char c, FILE *stream)
    return 0;
 }
 
-static print_buffer_t print_buffer = { 0, 0 };
+static print_buffer_t print_buffer = { .addr = 0, .buffer = { 0 } };
 
 uint8_t hd44780_print_commit()
 {
@@ -217,7 +222,13 @@ uint8_t hd44780_print_commit()
    args = memchr(print_buffer.buffer, 0, PATO_PRINT_BUFFER_SIZE);
    
    if( args != NULL ) {
+#if defined(HAVE_PRINTF)      
       vfprintf(&hd44780_out, (const char*)print_buffer.buffer, args+1);
+#else
+      for( uint8_t *ch = print_buffer.buffer; ch < args; ch++ )
+         if( hd44780_putchar(*ch, &hd44780_out) )
+            break;
+#endif /* HAVE_PRINTF */
       return 1;
    }
 

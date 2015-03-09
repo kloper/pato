@@ -52,6 +52,7 @@
 
 #undef HAVE_UART 
 #define HAVE_TWI
+#undef HAVE_PRINTF
 
 #ifndef __ASSEMBLY__
 
