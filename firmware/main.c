@@ -215,6 +215,7 @@ int main(int argc, char *argv[])
 	       reply->arg0 = cmd;
 	       reply->arg1 = packet->cmd;
 	       break;
+#if defined(HAVE_PRINT)               
 	    case PATO_CMD_PRINT_SETADDR:
 	       cmd = hd44780_print_set_addr(*(uint16_t*)&packet->arg0);
 	       reply->cmd = PATO_REPLY_OK;
@@ -237,6 +238,7 @@ int main(int argc, char *argv[])
 	       reply->arg0 = cmd;
 	       reply->arg1 = packet->cmd;
 	       break;
+#endif /* HAVE_PRINT */          
 	    default:
 	       reply->cmd = PATO_REPLY_ERROR;
 	       reply->arg0 = PATO_ERROR_BADCMD;

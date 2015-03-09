@@ -40,18 +40,21 @@
 #include <string.h>
 #include <stdint.h>
 
+#include <avr/eeprom.h>
+
+#include "config.h"
+
+#if defined(HAVE_PRINT)
+
+#include "hd44780.h"
+#include "print.h"
+
 #if defined(HAVE_PRINTF)
 #include <stdio.h>
 #else
 typedef char FILE;
 #define FDEV_SETUP_STREAM(a,b,c) 0
 #endif
-
-#include <avr/eeprom.h>
-
-#include "config.h"
-#include "hd44780.h"
-#include "print.h"
 
 typedef union _tty_policy {
    uint8_t data;
@@ -261,3 +264,4 @@ uint8_t hd44780_print_put(uint8_t arg0, uint8_t arg1)
    return 0;
 }
 
+#endif /* HAVE_PRINT */
