@@ -46,7 +46,9 @@
 #include "uart.h"
 
 #if defined(HAVE_UART)
-	
+
+#include "uart_compat.h"
+        
 	.text	
 
 	;; The only advantage of this ISR over the one implemented in

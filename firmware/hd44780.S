@@ -111,17 +111,17 @@ data_ddr_out:
 	.func byte_out
 byte_out:
 	swap	r24
-	call 	nibble_out
+	rcall 	nibble_out
 	swap	r24
-	call 	nibble_out 
+	rcall 	nibble_out 
 	ret
 	.endfunc
 
 	.func byte_in
 byte_in:	
 	clr r24
-	call nibble_in
-	call nibble_in
+	rcall nibble_in
+	rcall nibble_in
 	ret
 	.endfunc
 	
@@ -132,7 +132,7 @@ hd44780_reset:
 	sbi HD44780_CTRL_DDR, HD44780_RW
 	sbi HD44780_CTRL_DDR, HD44780_EN
 	sbi HD44780_CTRL_DDR, HD44780_RST
-	call data_ddr_out
+	rcall data_ddr_out
 	
 	cbi HD44780_DATA_OUT, HD44780_DB4
 	cbi HD44780_DATA_OUT, HD44780_DB5
@@ -154,7 +154,7 @@ hd44780_reset:
 	delay 0xff
 	sbi HD44780_CTRL_OUT, HD44780_RST
 	mov r25, r24
-	call hd44780_wait_busy
+	rcall hd44780_wait_busy
 
         ;; Power-on initialization, switching from 8-bit to 4-bit mode.
         ;; See [HD44780 Data-sheet](http://tinyurl.com/qxfogu9) see
@@ -164,20 +164,20 @@ hd44780_reset:
         ;; with 4-bit mode enabled. 
 	mov r24, r25	
 	swap r24
-	call nibble_out
+	rcall nibble_out
 	delay 0x8
 
         ;; recover r24 again and send full command
 	mov r24, r25
-	call hd44780_ir_write
-	call hd44780_wait_busy
+	rcall hd44780_ir_write
+	rcall hd44780_wait_busy
 
         ;; recover r24 again and send full command again
         ;; @bug I am not sure why this is needed, but somethimes display
         ;; wouldn't enter 2-line mode without the second invocation.
 	mov r24, r25
-	call hd44780_ir_write
-	call hd44780_wait_busy
+	rcall hd44780_ir_write
+	rcall hd44780_wait_busy
 
 	ret
 	.endfunc
@@ -187,18 +187,18 @@ hd44780_reset:
 hd44780_ir_write:
 	cbi HD44780_CTRL_OUT, HD44780_RS
 	cbi HD44780_CTRL_OUT, HD44780_RW
-	call byte_out
+	rcall byte_out
 	ret
 	.endfunc
 
 	.global hd44780_wait_busy
 	.func hd44780_wait_busy
 hd44780_wait_busy:
-	call data_ddr_in
+	rcall data_ddr_in
 	cbi HD44780_CTRL_OUT, HD44780_RS
 	sbi HD44780_CTRL_OUT, HD44780_RW
 10:
-	call byte_in
+	rcall byte_in
 	sbrc r24, 7
 	rjmp 10b
 
@@ -210,7 +210,7 @@ hd44780_wait_busy:
 hd44780_dr_write:
 	sbi HD44780_CTRL_OUT, HD44780_RS
 	cbi HD44780_CTRL_OUT, HD44780_RW
-	call byte_out
+	rcall byte_out
 	ret
 	.endfunc
 
@@ -219,6 +219,6 @@ hd44780_dr_write:
 hd44780_dr_read:
 	sbi HD44780_CTRL_OUT, HD44780_RS
 	sbi HD44780_CTRL_OUT, HD44780_RW
-	call byte_in
+	rcall byte_in
 	ret
 	.endfunc

@@ -41,6 +41,10 @@
 
 #include <avr/io.h>
 
+#ifndef TIFR0        
+#define TIFR0 TIFR
+#endif
+        
 	.global to_start
 	.func to_start
 	;; Input:

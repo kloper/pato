@@ -160,6 +160,21 @@
 #define HD44780_DB6 PD6
 #define HD44780_DB7 PD7
 #endif
+#if defined(__AVR_ATtiny2313__) 
+#define HD44780_CTRL_PORT PORTB
+
+#define HD44780_RS PB1
+#define HD44780_RW PB2
+#define HD44780_EN PB3
+#define HD44780_RST PB4
+
+#define HD44780_DATA_PORT PORTD
+
+#define HD44780_DB4 PD2
+#define HD44780_DB5 PD3
+#define HD44780_DB6 PD4
+#define HD44780_DB7 PD5
+#endif
 
 #define HD44780_BUSY HD44780_DB7
 

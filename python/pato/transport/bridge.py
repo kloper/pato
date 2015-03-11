@@ -48,7 +48,7 @@ from bridge import Bridge as BridgeProtocol
 from bridge.protocol import Cmd
 
 class Bridge(object):
-    def __init__(self, slave_addr, timeout = 0.2, serial_timeout = 10,
+    def __init__(self, slave_addr, timeout = 0.3, serial_timeout = 10,
                  *args, **kwargs):
         self.serial = serial.Serial(timeout = serial_timeout, *args, **kwargs)
         self.slave_addr = slave_addr
@@ -59,18 +59,25 @@ class Bridge(object):
         now = time.clock()
         elapsed = now
         while elapsed - now < self.timeout:
-            (status, send_remaining) = self.bridge.execute(Cmd.TWI_MASTER_SEND,
-                                                           self.slave_addr,
-                                                           request,
-                                                           0)
-            
-            (status, recv_remaining, reply) = self.bridge.execute(
-                Cmd.TWI_MASTER_RECV,
-                self.slave_addr,
-                5, 1, 1)
+            (send_status, send_remaining) = \
+                                self.bridge.execute(Cmd.TWI_MASTER_SEND,
+                                                    self.slave_addr,
+                                                    request,
+                                                    0)
+#            pdb.set_trace()
+            (recv_status, recv_remaining, reply) = \
+                                self.bridge.execute(
+                                    Cmd.TWI_MASTER_RECV,
+                                    self.slave_addr,
+                                    5, 1, 1)
+#            pdb.set_trace()
             
             elapsed = time.clock()
             if send_remaining + recv_remaining != 0:
+                print "send_remaining: {} status {:02x}".\
+                    format(send_remaining, send_status)
+                print "recv_remaining: {} status {:02x}".\
+                    format(recv_remaining, recv_status)
                 continue
 
             return reply

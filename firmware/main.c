@@ -56,7 +56,7 @@
 #define comm_outbuf uart_outbuf
 #define comm_recv uart_recv
 #define comm_send uart_send
-#define comm_skip
+#define comm_skip()
 #elif defined(HAVE_TWI)
 #define comm_init twi_init
 #define comm_outbuf twi_outbuf
@@ -143,6 +143,7 @@ int main(int argc, char *argv[])
 	       reply->arg0 = packet->cmd;
 	       reply->arg1 = packet->arg1 + 1;
 	       break;
+#if defined(HAVE_DIRECT_API)
 	    case PATO_CMD_DIRECT:
 	       switch(packet->arg0) {
 		  case PATO_DIRECT_CLR:
@@ -215,6 +216,7 @@ int main(int argc, char *argv[])
 	       reply->arg0 = cmd;
 	       reply->arg1 = packet->cmd;
 	       break;
+#endif /* HAVE_DIRECT_API */               
 #if defined(HAVE_PRINT)               
 	    case PATO_CMD_PRINT_SETADDR:
 	       cmd = hd44780_print_set_addr(*(uint16_t*)&packet->arg0);

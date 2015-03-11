@@ -52,6 +52,8 @@
 
 #if defined(HAVE_UART)
 
+#include "uart_compat.h"
+
 uint8_t g_uart_inbuf_head = 0;
 uint8_t g_uart_inbuf[UART_INBUF_SIZE];
 uint8_t g_uart_outbuf[UART_OUTBUF_SIZE];
@@ -149,8 +151,8 @@ void uart_init()
   UCSR0C = ucsr0c;
   UCSR0B = (1 << RXEN0)|(1 << TXEN0)|(1 << RXCIE0);
 
-  DDRE  |= (1 << 3); 
-  PORTE |= (1 << 2); 
+  UART_DDR  |= (1 << 3); 
+  UART_PORT |= (1 << 2); 
 }
 
 packet_t *uart_recv()
