@@ -46,6 +46,7 @@ import datetime
 import time
 import serial
 import math
+import struct
 
 import logging
 import logging.config
@@ -107,6 +108,9 @@ def int2str(val, size = 2):
         res.append( val & 0xff )
         val >>= 8
     return "".join(chr(c) for c in reversed(res))
+
+def float2str(val):
+    return struct.pack("<f", float(val))
 
 class NullTest(unittest.TestCase):    
     def test_ping(self):
@@ -184,7 +188,32 @@ class NullTest(unittest.TestCase):
                                  total & 0xff,
                                  (total >> 8) & 0xff)
                     pato.execute(Cmd.PRINT_COMMIT)
+                    
+    def test_print_float(self):
+        pato = Pato(self.transport)
 
+        self.reset_pato(pato)
+
+        pato.execute(Cmd.PRINT_SETADDR, 0)
+        def send(prefix, t, sin, cos, tan):
+            s = prefix + float2str(t) + float2str(sin) + \
+                float2str(cos) + float2str(tan) 
+            for pair in pairs(s):
+                pato.execute(Cmd.PRINT_PUT, ord(pair[0]), ord(pair[1]))
+
+        prefix = "\ft = %f\n" \
+                 "sin(t) = %f\n" \
+                 "cos(t) = %f\n" \
+                 "tan(t) = %f\0"
+
+        send(prefix, 0, 0, 0, 0)
+        
+        for i in xrange(10000):
+            t = i * 0.001
+            pato.execute(Cmd.PRINT_SETADDR, len(prefix))
+            send("", t, math.sin(t), math.cos(t), math.tan(t))
+            pato.execute(Cmd.PRINT_COMMIT)
+                    
     def test_print_overrun(self):
         pato = Pato(self.transport)
 
