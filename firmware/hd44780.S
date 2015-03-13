@@ -43,118 +43,117 @@
 
 #include "hd44780.h"
 
-	.section .text
+        .section .text
 
-	.macro delay delta
-	ldi	r18, \delta-1
-50:	dec	r18
-	brpl	50b
-	.endm
-	
-	.macro bit_out vreg, bitnum, outnum
-	sbi	HD44780_DATA_DDR, \outnum
-	sbrs	\vreg, \bitnum
-	cbi	HD44780_DATA_OUT, \outnum
-	sbrc	\vreg, \bitnum
-	sbi	HD44780_DATA_OUT, \outnum
-	.endm
-	
-	
-	.macro bit_in vreg, innum
-	lsl	\vreg
-	sbic HD44780_DATA_IN, \innum
-	inc	\vreg
-	.endm
-
-	.func nibble_out
-nibble_out:	
-	sbi HD44780_CTRL_OUT, HD44780_EN
+        .macro delay delta
+        ldi     r18, \delta-1
+50:     dec     r18
+        brpl    50b
+        .endm
+                
+        .func nibble_out
+nibble_out:     
+        clr r22
+        ;; get current state of all pins in data port
+        in r23, HD44780_DATA_IN
+        ;; clean out all non relevant bits
+        andi r23, (1<<HD44780_DB4)|(1<<HD44780_DB5)|\
+                  (1<<HD44780_DB6)|(1<<HD44780_DB7)
+        bst r24, 0
+        bld r22, HD44780_DB4
+        bst r24, 1
+        bld r22, HD44780_DB5
+        bst r24, 2
+        bld r22, HD44780_DB6
+        bst r24, 3
+        bld r22, HD44780_DB7
+        ;; calculate bit diff
+        sbi HD44780_CTRL_OUT, HD44780_EN
+        eor r22, r23
+        out HD44780_DATA_IN, r22
         nop
-	bit_out r24, 0, HD44780_DB4
-	bit_out r24, 1, HD44780_DB5
-	bit_out r24, 2, HD44780_DB6
-	bit_out r24, 3, HD44780_DB7
-	cbi HD44780_CTRL_OUT, HD44780_EN
-	ret
-	.endfunc
-
-	.func nibble_in
-nibble_in:	
-	sbi HD44780_CTRL_OUT, HD44780_EN
         nop
-	bit_in r24, HD44780_DB7
-	bit_in r24, HD44780_DB6
-	bit_in r24, HD44780_DB5
-	bit_in r24, HD44780_DB4
-	cbi HD44780_CTRL_OUT, HD44780_EN
-	ret
-	.endfunc
-	
-	.func data_ddr_in
-data_ddr_in:	
-	cbi HD44780_DATA_DDR, HD44780_DB4
-	cbi HD44780_DATA_DDR, HD44780_DB5
-	cbi HD44780_DATA_DDR, HD44780_DB6
-	cbi HD44780_DATA_DDR, HD44780_DB7
-	ret
-	.endfunc
+        cbi HD44780_CTRL_OUT, HD44780_EN
+        ret
+        .endfunc
 
-	.func data_ddr_out
-data_ddr_out:	
-	sbi HD44780_DATA_DDR, HD44780_DB4
-	sbi HD44780_DATA_DDR, HD44780_DB5
-	sbi HD44780_DATA_DDR, HD44780_DB6
-	sbi HD44780_DATA_DDR, HD44780_DB7
-	ret
-	.endfunc
-	
-	.func byte_out
+        .func nibble_in
+nibble_in:      
+        sbi HD44780_CTRL_OUT, HD44780_EN
+        nop
+        nop
+        nop
+        in r23, HD44780_DATA_IN
+        bst r23, HD44780_DB4
+        bld r24, 0
+        bst r23, HD44780_DB5
+        bld r24, 1
+        bst r23, HD44780_DB6
+        bld r24, 2
+        bst r23, HD44780_DB7
+        bld r24, 3
+        cbi HD44780_CTRL_OUT, HD44780_EN
+        ret
+        .endfunc
+                
+        .func byte_out
 byte_out:
-	swap	r24
-	rcall 	nibble_out
-	swap	r24
-	rcall 	nibble_out 
-	ret
-	.endfunc
+        swap    r24
+        rcall   nibble_out
+        swap    r24
+        rcall   nibble_out
+        ret
+        .endfunc
 
-	.func byte_in
-byte_in:	
-	clr r24
-	rcall nibble_in
-	rcall nibble_in
-	ret
-	.endfunc
-	
-	.global hd44780_reset
-	.func hd44780_reset
+        .func byte_in
+byte_in:
+        in r22, HD44780_DATA_DDR
+        ldi r23, ~((1<<HD44780_DB4)|(1<<HD44780_DB5)|\
+                   (1<<HD44780_DB6)|(1<<HD44780_DB7))
+        and r23, r22
+        out HD44780_DATA_DDR, r23
+        clr r24
+        rcall nibble_in
+        swap r24
+        rcall nibble_in
+        out HD44780_DATA_DDR, r22
+        ret
+        .endfunc
+        
+        .global hd44780_reset
+        .func hd44780_reset
 hd44780_reset:
-	sbi HD44780_CTRL_DDR, HD44780_RS
-	sbi HD44780_CTRL_DDR, HD44780_RW
-	sbi HD44780_CTRL_DDR, HD44780_EN
-	sbi HD44780_CTRL_DDR, HD44780_RST
-	rcall data_ddr_out
-	
-	cbi HD44780_DATA_OUT, HD44780_DB4
-	cbi HD44780_DATA_OUT, HD44780_DB5
-	cbi HD44780_DATA_OUT, HD44780_DB6
-	cbi HD44780_DATA_OUT, HD44780_DB7
+        sbi HD44780_CTRL_DDR, HD44780_RS
+        sbi HD44780_CTRL_DDR, HD44780_RW
+        sbi HD44780_CTRL_DDR, HD44780_EN
+        sbi HD44780_CTRL_DDR, HD44780_RST
 
-	cbi HD44780_CTRL_OUT, HD44780_RS
-	cbi HD44780_CTRL_OUT, HD44780_RW
-	cbi HD44780_CTRL_OUT, HD44780_EN	
-	cbi HD44780_CTRL_OUT, HD44780_RST
+        sbi HD44780_DATA_DDR, HD44780_DB4
+        sbi HD44780_DATA_DDR, HD44780_DB5
+        sbi HD44780_DATA_DDR, HD44780_DB6
+        sbi HD44780_DATA_DDR, HD44780_DB7
+        
+        cbi HD44780_DATA_OUT, HD44780_DB4
+        cbi HD44780_DATA_OUT, HD44780_DB5
+        cbi HD44780_DATA_OUT, HD44780_DB6
+        cbi HD44780_DATA_OUT, HD44780_DB7
 
-	;; if only shutdown is required - exit
-	cpi r24, 0xff
-	brne 10f
-	ret
+        cbi HD44780_CTRL_OUT, HD44780_RS
+        cbi HD44780_CTRL_OUT, HD44780_RW
+        cbi HD44780_CTRL_OUT, HD44780_EN        
+        cbi HD44780_CTRL_OUT, HD44780_RST
+
+        ;; if only shutdown is required - exit
+        cpi r24, 0xff
+        brne 10f
+        ret
 
 10:
         ;; set reset pin up, wait till HD44780 completes boot
-	delay 0xff
-	sbi HD44780_CTRL_OUT, HD44780_RST
-	mov r25, r24
-	rcall hd44780_wait_busy
+        delay 0x7f
+        sbi HD44780_CTRL_OUT, HD44780_RST
+        mov r25, r24
+        rcall hd44780_wait_busy
 
         ;; Power-on initialization, switching from 8-bit to 4-bit mode.
         ;; See [HD44780 Data-sheet](http://tinyurl.com/qxfogu9) see
@@ -162,63 +161,62 @@ hd44780_reset:
         
         ;; r24 (input param) is supposed to be loaded with FUNC_SET command
         ;; with 4-bit mode enabled. 
-	mov r24, r25	
-	swap r24
-	rcall nibble_out
-	delay 0x8
+        mov r24, r25    
+        swap r24
+        rcall nibble_out
+        delay 0x8
 
         ;; recover r24 again and send full command
-	mov r24, r25
-	rcall hd44780_ir_write
-	rcall hd44780_wait_busy
+        mov r24, r25
+        rcall hd44780_ir_write
+        rcall hd44780_wait_busy
 
         ;; recover r24 again and send full command again
         ;; @bug I am not sure why this is needed, but somethimes display
         ;; wouldn't enter 2-line mode without the second invocation.
-	mov r24, r25
-	rcall hd44780_ir_write
-	rcall hd44780_wait_busy
+        mov r24, r25
+        rcall hd44780_ir_write
+        rcall hd44780_wait_busy
 
-	ret
-	.endfunc
-	
-	.global hd44780_ir_write
-	.func hd44780_ir_write
+        ret
+        .endfunc
+        
+        .global hd44780_ir_write
+        .func hd44780_ir_write
 hd44780_ir_write:
-	cbi HD44780_CTRL_OUT, HD44780_RS
-	cbi HD44780_CTRL_OUT, HD44780_RW
-	rcall byte_out
-	ret
-	.endfunc
+        cbi HD44780_CTRL_OUT, HD44780_RS
+        cbi HD44780_CTRL_OUT, HD44780_RW
+        rcall byte_out
+        ret
+        .endfunc
 
-	.global hd44780_wait_busy
-	.func hd44780_wait_busy
+        .global hd44780_wait_busy
+        .func hd44780_wait_busy
 hd44780_wait_busy:
-	rcall data_ddr_in
-	cbi HD44780_CTRL_OUT, HD44780_RS
-	sbi HD44780_CTRL_OUT, HD44780_RW
+        cbi HD44780_CTRL_OUT, HD44780_RS
+        sbi HD44780_CTRL_OUT, HD44780_RW
 10:
-	rcall byte_in
-	sbrc r24, 7
-	rjmp 10b
-
-	ret
-	.endfunc
-	
-	.global hd44780_dr_write
-	.func hd44780_dr_write
+        rcall byte_in
+        sbrc r24, 7
+        rjmp 10b
+        
+        ret
+        .endfunc
+        
+        .global hd44780_dr_write
+        .func hd44780_dr_write
 hd44780_dr_write:
-	sbi HD44780_CTRL_OUT, HD44780_RS
-	cbi HD44780_CTRL_OUT, HD44780_RW
-	rcall byte_out
-	ret
-	.endfunc
+        sbi HD44780_CTRL_OUT, HD44780_RS
+        cbi HD44780_CTRL_OUT, HD44780_RW
+        rcall byte_out
+        ret
+        .endfunc
 
-	.global hd44780_dr_read
-	.func hd44780_dr_read
+        .global hd44780_dr_read
+        .func hd44780_dr_read
 hd44780_dr_read:
-	sbi HD44780_CTRL_OUT, HD44780_RS
-	sbi HD44780_CTRL_OUT, HD44780_RW
-	rcall byte_in
-	ret
-	.endfunc
+        sbi HD44780_CTRL_OUT, HD44780_RS
+        sbi HD44780_CTRL_OUT, HD44780_RW
+        rcall byte_in
+        ret
+        .endfunc
