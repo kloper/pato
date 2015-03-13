@@ -77,9 +77,9 @@ uint8_t g_twi_states_cur = 0;
 
 ISR(TWI_vect)
 {
-volatile uint8_t twsr, twcr;
-   twsr = TWSR & 0xF8;
-   
+   volatile uint8_t twsr, twcr;
+
+   twsr = TWSR & 0xF8;   
    twcr = (1<<TWINT) | (1<<TWEN) | (1<<TWIE);
 
 #ifdef DEBUG_TWI
@@ -115,7 +115,7 @@ volatile uint8_t twsr, twcr;
 	    twcr |= (1<<TWEA);
          else {
             g_twi_input.status = twsr;
-            twcr &= ~(1<<TWINT);
+            twcr &= ~((1<<TWINT)|(1<<TWIE));
          }
 	 break;
       case 0x88: 
