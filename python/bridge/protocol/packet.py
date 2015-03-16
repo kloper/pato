@@ -78,9 +78,9 @@ class Reply(PacketBase):
                         msg = "Bad CRC",
                         packet = packet)
 
-        cls.assertTrue( packet[3] > 0 ,
-                         msg = "Error responce",
-                         error_code = packet[5],
-                         cmd = packet[4] )
+        if packet[3] <= 0:
+            raise ProtocolException( msg = "Error responce",
+                                     error_code = packet[5],
+                                     cmd = packet[4] )
 
         return (packet[3], packet[4:])
