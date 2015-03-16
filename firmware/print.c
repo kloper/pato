@@ -60,6 +60,7 @@ typedef union _tty_policy {
    uint8_t data;
    struct {
       uint8_t eol_expand_line: 1;
+      uint8_t tab_size:3;
    } conf;
 } tty_policy_t;
 
@@ -195,6 +196,28 @@ static int hd44780_putchar(char c, FILE *stream)
 	 goto_addr(coord2addr(bcoord));
 	 return 0;
       }
+      case '\t': {
+         if(policy.conf.eol_expand_line)
+            goto_addr(coord2addr(coord_add(pcoord, policy.conf.tab_size, 0)));
+         else {
+            tty_coord_t edge = line_edge(pcoord, 0);
+            tty_coord_t ncoord = pcoord;
+            ncoord.x = min(pcoord.x + policy.conf.tab_size, edge.x);
+            goto_addr(coord2addr(ncoord));
+         }
+         return 0;
+      } 
+      case '\v': {
+         goto_addr(coord2addr(coord_add(pcoord, 0, 1)));
+         return 0;
+      } 
+      case '\r': {
+         goto_addr(coord2addr(line_edge(pcoord,1)));
+         return 0;
+      } 
+      case '\x1b': {
+         return 0;
+      }         
    }
 
    if( tty_state.skip_til_nl )

@@ -68,6 +68,9 @@
 #define HAVE_DIRECT_API
 #endif
 
+#define min(a,b) (((a)<(b))?(a):(b))
+#define max(a,b) (((a)>(b))?(a):(b))
+
 #ifndef __ASSEMBLY__
 
 #if defined(HAVE_UART)
