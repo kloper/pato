@@ -43,8 +43,8 @@ import pdb
 import unittest
 import traceback
 
-localdir = os.path.dirname( os.path.realpath(__file__) );
-sys.path.append( os.path.join( localdir, '..') );
+localdir = os.path.dirname( os.path.realpath(__file__) )
+sys.path.append( os.path.join( localdir, '..') )
 
 from util.cobs import encode, decode, seq_join, seq_split
 

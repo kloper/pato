@@ -1,7 +1,7 @@
 # -*- python -*-
 """@file
 
-@brief Common utilies
+@brief Common test stuff
 
 Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>. 
 All rights reserved.
@@ -37,17 +37,46 @@ are those of the authors and should not be interpreted as representing
 official policies, either expressed or implied, of the Pato Project.
 """
 
-import struct
+import os
+import sys
+import datetime
 
-def pairs(s):
-    strlen = len(s) + len(s)%2
-    s += "\0"
-    for i in xrange(0, strlen, 2):
-        yield s[i:i+2]
+import logging
+import logging.config
 
-def int2str(val):
-    return struct.pack("<H", val)
+logging.config.dictConfig( 
+    { 'version': 1,              
+      'disable_existing_loggers': True,
+      'formatters': {
+          'standard': {
+              'format': '%(asctime)s:%(levelname)s:'
+              '%(filename)s:%(lineno)d: %(message)s'
+          },
+      },
+      'handlers': {
+          'default': {
+              'level': 'DEBUG',    
+              'class': "logging.StreamHandler",
+              'stream': sys.stdout,
+              'formatter': 'standard'
+          },  
+          'file': {
+              'level': 'DEBUG',    
+              'class': "logging.FileHandler",
+              'filename': "{}-{}.log".\
+              format( __file__, datetime.datetime.now().\
+                      strftime("%d%m%Y-%H%M%S")),              
+              'formatter': 'standard'
+          },  
+      },
+      'loggers': {
+          'default': {                  
+              'handlers': ['default', 'file'], 
+              'level': 'DEBUG',  
+              'propagate': False
+          },
+    },
+  }
+)
 
-def float2str(val):
-    return struct.pack("<f", float(val))
- 
+logger = logging.getLogger('default')
