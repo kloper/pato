@@ -127,6 +127,10 @@
  *
  * @def HD44780_BUSY
  * Alias or identical to HD44780_DB7.
+ *
+ * @note for future
+ * The V0 pin of HD44780 has limited usability range - its from 0 to 1V approx.
+ *
  * @} 
  */
 
@@ -146,19 +150,19 @@
 #define HD44780_DB7 PC7
 #endif
 #if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega328__)
-#define HD44780_CTRL_PORT PORTC
+#define HD44780_CTRL_PORT PORTD
 
-#define HD44780_RS PC0
-#define HD44780_RW PC1
-#define HD44780_EN PC2
-#define HD44780_RST PC3
+#define HD44780_RS PD5
+#define HD44780_RW PD6
+#define HD44780_EN PD7
+#define HD44780_RST PD4
 
-#define HD44780_DATA_PORT PORTD
+#define HD44780_DATA_PORT PORTC
 
-#define HD44780_DB4 PD4
-#define HD44780_DB5 PD5
-#define HD44780_DB6 PD6
-#define HD44780_DB7 PD7
+#define HD44780_DB4 PC0
+#define HD44780_DB5 PC1
+#define HD44780_DB6 PC2
+#define HD44780_DB7 PC3
 #endif
 #if defined(__AVR_ATtiny2313__) 
 #define HD44780_CTRL_PORT PORTB
