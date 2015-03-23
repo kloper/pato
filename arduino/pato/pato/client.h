@@ -51,6 +51,12 @@ public:
       SEP_ERROR = 3,
       REP_ERROR = 4
    } error_t;
+
+   typedef enum {
+      USER_DEFINED = 1,
+      SHUTDOWN = 2,
+      DEFAULT = 0
+   } reset_type;
    
    Pato(const AbstractTransport &transport):
       m_transport(transport),
@@ -60,7 +66,87 @@ public:
    uint8_t ping(uint8_t val) {
       if( query(PATO_CMD_PING, 0, val) )
          return m_reply.arg1;
-      return 0;
+      return 0xff;
+   }
+
+   uint8_t clear_screen() {
+      if( query(PATO_CMD_DIRECT, PATO_DIRECT_CLR, 0) )
+         return m_reply.arg0;
+      return 0xff;
+   }
+
+   uint8_t return_home() {
+      if( query(PATO_CMD_DIRECT, PATO_DIRECT_HOME, 0) )
+         return m_reply.arg0;
+      return 0xff;
+   }
+
+   uint8_t entry_mode_set(const bool shift_direction,
+                          const bool shift_subject) {
+      if( query(PATO_CMD_DIRECT, PATO_DIRECT_EMS,
+                (shift_direction ? 0x02 : 0) | (shift_subject ? 0x01 : 0)) )
+         return m_reply.arg0;
+      return 0xff;
+   }
+
+   uint8_t display_control(const bool display_on,
+                           const bool cursor_on,
+                           const bool cursor_blink) {
+      if( query(PATO_CMD_DIRECT, PATO_DIRECT_DCTRL,
+                (display_on ? 0x04 : 0) |
+                (cursor_on ? 0x02 : 0)  |
+                (cursor_blink ? 0x01 : 0)) )
+         return m_reply.arg0;
+      return 0xff;      
+   }
+
+   uint8_t shift_control(const bool display_shift,
+                 const bool right_shift) {
+      if( query(PATO_CMD_DIRECT, PATO_DIRECT_SHIFT,
+                (display_shift ? 0x08 : 0) |
+                (right_shift ? 0x04 : 0)) )
+         return m_reply.arg0;
+      return 0xff;      
+   }
+
+   uint8_t set_cgram_addr(const uint8_t addr) {
+      if( query(PATO_CMD_DIRECT, PATO_DIRECT_CGADDR, addr & 0x3f) )
+         return m_reply.arg0;
+      return 0xff;      
+   }
+
+   uint8_t set_ddram_addr(const uint8_t addr) {
+      if( query(PATO_CMD_DIRECT, PATO_DIRECT_DDADDR, addr & 0x7f) )
+         return m_reply.arg0;
+      return 0xff;      
+   }
+
+   uint8_t busy_wait() {
+      if( query(PATO_CMD_DIRECT, PATO_DIRECT_BUSY_WAIT, 0) )
+         return m_reply.arg0;
+      return 0xff;      
+   }
+   
+   uint8_t display_write(const uint8_t data) {
+      if( query(PATO_CMD_DIRECT, PATO_DIRECT_WRITE, data) )
+         return m_reply.arg0;
+      return 0xff;      
+   }
+
+   uint8_t display_read(uint8_t &data) {
+      if( query(PATO_CMD_DIRECT, PATO_DIRECT_READ, 0) ) {
+         data = m_reply.arg1;
+         return m_reply.arg0;
+      }
+      return 0xff;      
+   }
+
+   uint8_t reset_display(const reset_type type = DEFAULT,
+                        const uint8_t data = 0) {
+      if( query(PATO_CMD_RESET, type, data) ) {
+         return m_reply.arg0;
+      }
+      return 0xff;      
    }
    
 protected:
