@@ -125,6 +125,9 @@
         <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
       </AvrGcc>
     </ToolchainSettings>
+    <PostBuildEvent>copy $(MSBuildProjectDirectory)\protocol.h $(MSBuildProjectDirectory)\..\arduino\pato\pato\protocol.h
+copy $(MSBuildProjectDirectory)\crc.h $(MSBuildProjectDirectory)\..\arduino\pato\utility\crc.h
+copy $(MSBuildProjectDirectory)\crc.c $(MSBuildProjectDirectory)\..\arduino\pato\utility\crc.c</PostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="config.c">
