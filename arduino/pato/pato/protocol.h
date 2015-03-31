@@ -218,6 +218,30 @@
 #define PATO_CMD_PRINT_PUT     0x07
 
 /**
+ * @brief PRINT PUT PTR Command
+ *
+ * This is a special version of \ref PATO_CMD_PRINT_PUT. It will treat incoming
+ * arg0 and arg1 as a single uint16_t offset from beginning of the print buffer.
+ * It will add the offset to the pointer to the beginning of the print buffer
+ * and save the resulting pointer at the current address. 
+ *
+ * This is required for treating "%s" formats that require both pointer and
+ * actual string to be delvered from master.
+ * 
+ * Field | Request                | Reply
+ * ------|------------------------|-----------------------
+ * cmd   | PATO_CMD_PRINT_PUT_PTR | PATO_REPLY_OK
+ * arg0  | offset low byte        | status
+ * arg1  | offset high byte       | PATO_CMD_PRINT_PUT_PTR
+ *
+ * @param byte0 low byte of the offset
+ * @param byte1 high byte of the offset
+ * @param status true if the operation succeeded (enough space in the buffer 
+ *        and the input offset is valid) false otherwise.
+ */
+#define PATO_CMD_PRINT_PUT_PTR 0x09
+
+/**
  * @brief PRINT COMMIT Command
  *
  * Send content of the print buffer to HD44780 display.
@@ -231,12 +255,17 @@
  * buffer as a printf format string separated by '\0' character with its 
  * parameters.
  *
+ * Arguments are treated as offset in the print buffer, see 
+ * hd44780_print_commit() and @ref print_buffer_t for more information.
+ *
  * Field | Request               | Reply
  * ------|-----------------------|-----------------------
  * cmd   | PATO_CMD_PRINT_COMMIT | PATO_REPLY_OK
- * arg0  | not used              | status
- * arg1  | not used              | PATO_CMD_PRINT_COMMIT
+ * arg0  | offset low byte       | status
+ * arg1  | offset high byte      | PATO_CMD_PRINT_COMMIT
  *
+ * @param arg0 low byte of the offset
+ * @param arg1 high byte of the offset
  * @param status true if the operation succeeded false otherwise. The operation
  *               may fail only if there is no '\0' character terminating the
  *               buffer, or separating format from parameters.
