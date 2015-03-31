@@ -23,8 +23,8 @@ have small stack footprint (3 nested calls maximum).
 Pato aims to be an all-in-one solution that integrates different software
 components:
 
- * HD44780 display driver and provides access to the basic display API
- * Communication drivers - UART or I2C
+ * HD44780 display driver - provides access to the basic display API
+ * Communication drivers - UART or I2C (TWI in Atmel terms)
  * Output buffering. Pato stores text to be displayed in memory and allows
    delta modifications only for parts that should change.   
  * String formatting - based on printf library from Atmel. This
