@@ -241,24 +241,57 @@ static int hd44780_putchar(char c, FILE *stream)
 
 static print_buffer_t print_buffer = { .addr = 0, .buffer = { 0 } };
 
-uint8_t hd44780_print_commit()
+/**
+ * @brief Flush print buffer into display, applying formatting (if available)
+ *
+ * Without printf support, interpret the print buffer just a null terminated 
+ * string and copy it to memory.
+ *
+ * With printf support the buffer shall hold both pintf's format string and
+ * its parameters in binary format ready to be consumed by the printf() 
+ * function. The format string will be always taken from the beginning of the
+ * buffer and must be null terminated.
+ * 
+ * The input argument defines  uint16_t offset inside the buffer. If the offset
+ * is zero, the arguments for printf() are taken immediately after the 
+ * null character terminating the format string. Otherwise, the offset is taken
+ * as the start of parameters for printf().
+ * 
+ * Without printf support, the offset is checked for validity but not used.
+ *
+ * With or without printf support copying to display is performed with 
+ * applying terminal characters and escape sequences.
+ *
+ * @param[in] offset offset in the print buffer to start of printf()'s arguments
+ * @returns 
+ * True of the format string is zero terminated and the offset is inside of 
+ * buffer.
+ *
+ * @see print_buffer_t
+ */
+uint8_t hd44780_print_commit(uint16_t offset)
 {
    uint8_t *args;
-      
-   args = memchr(print_buffer.buffer, 0, PATO_PRINT_BUFFER_SIZE);
-   
-   if( args != NULL ) {
-#if defined(HAVE_PRINTF)      
-      vfprintf(&hd44780_out, (const char*)print_buffer.buffer, args+1);
-#else
-      for( uint8_t *ch = print_buffer.buffer; ch < args; ch++ )
-         if( hd44780_putchar(*ch, &hd44780_out) )
-            break;
-#endif /* HAVE_PRINTF */
-      return 1;
-   }
 
-   return 0;
+   args = memchr(print_buffer.buffer, 0, PATO_PRINT_BUFFER_SIZE);
+   if( args == NULL )
+      return 0;
+   
+   if( offset > 0 ) {
+      if(offset < PATO_PRINT_BUFFER_SIZE ) 
+         args = print_buffer.buffer + offset;
+      else 
+         return 0;
+   }
+   
+#if defined(HAVE_PRINTF)      
+   vfprintf(&hd44780_out, (const char*)print_buffer.buffer, args+1);
+#else
+   for( uint8_t *ch = print_buffer.buffer; ch < args; ch++ )
+      if( hd44780_putchar(*ch, &hd44780_out) )
+         break;
+#endif /* HAVE_PRINTF */
+   return 1;
 }
 
 uint8_t hd44780_print_set_addr(uint16_t addr)
@@ -276,11 +309,55 @@ uint16_t hd44780_print_get_addr()
    return print_buffer.addr;
 }
 
+/**
+ * @brief Put two bytes at current address at print buffer
+ * 
+ * This function puts two bytes inside print buffer. Each byte is put
+ * at current address and the address is autoincremented. 
+ *
+ * @param[in] arg0 first byte to be put
+ * @param[in] arg1 second byte to be put.
+ * @returns 
+ * True if the buffer has enough space for both bytes. 
+ * If the buffer has none or a single free byte none of the input bytes
+ * is written and the current address is not incremented.
+ */
 uint8_t hd44780_print_put(uint8_t arg0, uint8_t arg1)
 {
    if( print_buffer.addr < PATO_PRINT_BUFFER_SIZE-2 ) {
       print_buffer.buffer[print_buffer.addr++] = arg0;
       print_buffer.buffer[print_buffer.addr++] = arg1;
+      return 1;
+   }
+
+   return 0;
+}
+
+/**
+ * @brief Put `char*` into print buffr
+ * 
+ * This is a special version of hd44780_print_put(). It will treat incoming
+ * argument as uint16_t offset from beginning of the print buffer.
+ * It will add the offset to the pointer to the beginning of the print buffer
+ * and save the resulting pointer at the current address. 
+ *
+ * This is required for treating "%s" formats that require both pointer and
+ * actual string to be delvered from master.
+ *
+ * This function increments the current print address by two.
+ *
+ * @param[in] offset offset from beginning of the print buffer to create 
+ *                   argument pointer
+ * @returns True if the operation was successfull (valid offset)
+ */
+uint8_t hd44780_print_put_ptr(uint16_t offset)
+{
+   if( print_buffer.addr < PATO_PRINT_BUFFER_SIZE-2 &&
+       offset >= 0 && offset < PATO_PRINT_BUFFER_SIZE )
+   {
+      uint8_t *ptr = print_buffer.buffer + offset;
+      print_buffer.buffer[print_buffer.addr++] = ((uint16_t)ptr) & 0xff;
+      print_buffer.buffer[print_buffer.addr++] = ((uint16_t)ptr >> 8) & 0xff;
       return 1;
    }
 

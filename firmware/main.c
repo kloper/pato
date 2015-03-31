@@ -229,13 +229,19 @@ int main(int argc, char *argv[])
 	       reply->cmd = PATO_REPLY_OK;
 	    } break;
 	    case PATO_CMD_PRINT_COMMIT:
-	       cmd = hd44780_print_commit();
+	       cmd = hd44780_print_commit(*(uint16_t*)&packet->arg0);
 	       reply->cmd = PATO_REPLY_OK;
 	       reply->arg0 = cmd;
 	       reply->arg1 = packet->cmd;
 	       break;
 	    case PATO_CMD_PRINT_PUT:
 	       cmd = hd44780_print_put(packet->arg0, packet->arg1);
+	       reply->cmd = PATO_REPLY_OK;
+	       reply->arg0 = cmd;
+	       reply->arg1 = packet->cmd;
+	       break;
+	    case PATO_CMD_PRINT_PUT_PTR:
+	       cmd = hd44780_print_put_ptr(*(uint16_t*)&packet->arg0);
 	       reply->cmd = PATO_REPLY_OK;
 	       reply->arg0 = cmd;
 	       reply->arg1 = packet->cmd;

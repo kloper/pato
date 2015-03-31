@@ -44,17 +44,47 @@
 
 #define PATO_PRINT_BUFFER_SIZE 80
 
+/**
+ * @brief Print buffer
+ *
+ * A buffer that holds all the information required for formatting text
+ * that is displayed by the controlled HD44780. 
+ * 
+ * Without printf support, this buffer shall hold just a null terminated 
+ * string to be copied to HD44780 memory.
+ *
+ * With printf support the buffer shall hold both pintf's format string and
+ * its parameters in binary format ready to be consumed by the printf() 
+ * function. 
+ *
+ * It is responsibility of Pato's user to construct a valid content in the 
+ * buffer either using hd44780_print_put(), hd44780_print_set_addr(), 
+ * hd44780_print_commit() functions or by using @ref PATO_CMD_PRINT_PUT,
+ * @ref PATO_CMD_PRINT_SETADDR, @ref PATO_CMD_PRINT_COMMIT and other print 
+ * APIs. It possible for the user to change only parts of buffer by changing
+ * the current address.
+ *
+ * The current print address is an offset in the buffer that defines the next
+ * byte to be filled by hd44780_print_put(). Normally the current address is
+ * autoincremented after each byte written.
+ * 
+ */
 typedef struct _print_buffer {
-   uint16_t addr;
-   uint8_t  buffer[PATO_PRINT_BUFFER_SIZE];
+   uint16_t addr; /**< Current print address - offset in the buffer 
+                     that determines position of next filled byte */
+   uint8_t  buffer[PATO_PRINT_BUFFER_SIZE]; /**< Print buffer */
 } print_buffer_t;
 
+/**
+ * @brief Print buffer singletone 
+ */
 extern print_buffer_t g_print_buffer;
 
-extern uint8_t hd44780_print_commit(void);
+extern uint8_t hd44780_print_commit(uint16_t offset);
 extern uint8_t hd44780_print_set_addr(uint16_t addr);
 extern uint16_t hd44780_print_get_addr();
 extern uint8_t hd44780_print_put(uint8_t arg0, uint8_t arg1);
+extern uint8_t hd44780_print_put_ptr(uint16_t offset);
 
 #endif /* HAVE_PRINT */
 
