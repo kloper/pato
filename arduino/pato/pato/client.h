@@ -148,7 +148,126 @@ public:
       }
       return 0xff;      
    }
-   
+
+   uint8_t print_set_addr(const uint16_t addr) {
+      if( query(PATO_CMD_PRINT_SETADDR, addr & 0xff, (addr>>8) & 0xff) ) {
+         return m_reply.arg0;
+      }
+      return 0xff;      
+   }
+
+   uint8_t print_set_addr(uint16_t& addr) {
+      if( query(PATO_CMD_PRINT_GETADDR, 0, 0) ) {
+         addr = (m_reply.arg1 << 8) & m_reply.arg0;
+         return 1;
+      }
+      return 0xff;      
+   }
+
+   uint8_t print_commit() {
+      if( query(PATO_CMD_PRINT_COMMIT, 0, 0) ) {
+         return m_reply.arg0;
+      }
+      return 0xff;      
+   }
+
+   uint8_t print_put(uint8_t a, uint8_t b) {
+      if( query(PATO_CMD_PRINT_PUT, a, b) ) {
+         return m_reply.arg0;
+      }
+      return 0xff;      
+   }
+
+   uint8_t print_upload(const uint8_t* begin, const uint8_t *end) {
+      uint8_t rc = 1;
+      uint8_t a, b;
+
+      while( begin != NULL && end != NULL && begin < end ) {
+         a = *begin++;
+         b = (begin < end) ? *begin++ : 0;
+         rc = print_put(a,b);
+         if( !rc ) return rc;            
+      }
+      return rc;
+   }
+
+   template <typename T>
+   uint8_t print_upload(const T &val) {
+      return print_upload((uint8_t*)&val, (uint8_t*)&val + sizeof(T));
+   }
+
+   template <typename T>
+   uint8_t print_upload(T *val) {
+      return print_upload((uint8_t*)val, (uint8_t*)(val+1));
+   }
+
+   uint8_t print_upload(const char *val) {
+      const char *last = val;
+      while(*last) last++; 
+      return print_upload((uint8_t*)val, (uint8_t*)(last+1));
+   }
+
+   uint8_t print_string(const char *format, const bool commit = true) {
+      uint8_t rc;
+      
+      if( !format )
+         return 0;     
+      
+      if( format != m_format_cache ) {
+         rc = print_set_addr(0);
+         if( !rc ) return rc;
+
+         m_format_cache = format;
+
+         rc = print_upload(format);
+         if( !rc ) return rc;
+      }
+
+      const char *last = format;
+      while(*last) last++;
+      rc = print_set_addr(last-format+1);
+      if( !rc ) return rc;
+
+      if( commit )
+         rc = print_commit();
+      return rc;
+   }
+
+   uint8_t print(const char *format) {
+      uint8_t rc = print_string(format, false);
+      if( !rc ) return rc;
+
+      rc = print_commit();
+      return rc;
+   }
+
+   template <typename A0>
+   uint8_t print(const char *format, const A0 &a0) {
+      uint8_t rc = print_string(format, false);
+      if( !rc ) return rc;
+      
+      rc = print_upload(a0);
+      if( !rc ) return rc;
+
+      rc = print_commit();
+      return rc;
+   }
+
+   template <typename A0, typename A1>
+   uint8_t print(const char *format, const A0 &a0, const A1 &a1) {
+      uint8_t rc = print_string(format, false);
+      if( !rc ) return rc;
+      
+      rc = print_upload(a0);
+      if( !rc ) return rc;
+
+      rc = print_upload(a1);
+      if( !rc ) return rc;
+
+      rc = print_commit();
+      return rc;
+   }
+
 protected:
    bool query(uint8_t cmd, uint8_t arg0, uint8_t arg1) {
       m_error = NO_ERROR;
@@ -181,7 +300,7 @@ protected:
    }
    
 private:
-   const uint8_t *m_format_cache;
+   const char *m_format_cache;
    packet_t m_request;
    packet_t m_reply;
    error_t m_error;
