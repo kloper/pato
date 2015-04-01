@@ -3,7 +3,7 @@
 
 @brief Basic stuff for constructing Pato packets
 
-Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>. 
+Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>.
 All rights reserved.
 
 @page License
@@ -39,19 +39,16 @@ official policies, either expressed or implied, of the Pato Project.
 
 import pdb
 
-from collections import defaultdict
-
 from util.packet import PacketBase, tree
-from util.protocol import ProtocolException
 from util.crc import crc8
 
-from pato.protocol import Reply as ReplyVal, Error
+from pato.protocol import Reply as ReplyVal
 
 class Request(PacketBase):
     Registry = tree()
-    
+
     @classmethod
-    def compile(cls, payload = []):
+    def compile(cls, payload = None):
         cls.assertTrue( len(payload) <= 2, "Payload must be 2 bytes" )
 
         res = [cls.cmd, payload[0], payload[1]]
@@ -60,7 +57,7 @@ class Request(PacketBase):
 
 class Reply(PacketBase):
     Registry = tree()
-    
+
     @classmethod
     def parse(cls, packet):
         cls.assertTrue( len(packet) == 5, "Packet length must be 5" )

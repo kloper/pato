@@ -109,8 +109,33 @@ class NullTest(unittest.TestCase):
         str = "Hello World!!! 1 2 3 4 5 \0"
         for pair in pairs(str):
             pato.execute(Cmd.PRINT_PUT, ord(pair[0]), ord(pair[1]))
-        pato.execute(Cmd.PRINT_COMMIT)
+        pato.execute(Cmd.PRINT_COMMIT, 0)
 
+    def test_print_ptr(self):
+        pato = Pato(self.transport)
+
+        self.reset_pato(pato)
+
+        pato.execute(Cmd.PRINT_SETADDR, 0)
+        fmt = "\fName: %s\n\t(%d)\0"
+        for pair in pairs(fmt):
+            pato.execute(Cmd.PRINT_PUT, ord(pair[0]), ord(pair[1]))
+        name_offset = pato.execute(Cmd.PRINT_GETADDR)
+
+        for name in ["pato \0", "pocoyo \0", "sleepy bird\0"]:
+            pato.execute(Cmd.PRINT_SETADDR, name_offset)
+            for pair in pairs(name):
+                pato.execute(Cmd.PRINT_PUT, ord(pair[0]), ord(pair[1]))
+
+            params_offset = pato.execute(Cmd.PRINT_GETADDR)
+            pato.execute(Cmd.PRINT_PUT_PTR, name_offset)
+
+            for pair in pairs(int2str(len(name))):
+                pato.execute(Cmd.PRINT_PUT, ord(pair[0]), ord(pair[1]))
+            
+            pato.execute(Cmd.PRINT_COMMIT, params_offset)
+            time.sleep(1)
+            
     def test_print_ex(self):
         pato = Pato(self.transport)
 
@@ -136,7 +161,7 @@ class NullTest(unittest.TestCase):
                     pato.execute(Cmd.PRINT_PUT,
                                  total & 0xff,
                                  (total >> 8) & 0xff)
-                    pato.execute(Cmd.PRINT_COMMIT)
+                    pato.execute(Cmd.PRINT_COMMIT, 0)
                     
     def test_print_float(self):
         pato = Pato(self.transport)
@@ -161,7 +186,7 @@ class NullTest(unittest.TestCase):
             t = i * 0.001
             pato.execute(Cmd.PRINT_SETADDR, len(prefix))
             send("", t, math.sin(t), math.cos(t), math.tan(t))
-            pato.execute(Cmd.PRINT_COMMIT)
+            pato.execute(Cmd.PRINT_COMMIT, 0)
                     
     def test_print_overrun(self):
         pato = Pato(self.transport)
@@ -180,12 +205,12 @@ class NullTest(unittest.TestCase):
         pato.execute(Cmd.PRINT_SETADDR, 0)
         for pair in pairs(line1):
             pato.execute(Cmd.PRINT_PUT, ord(pair[0]), ord(pair[1]))
-        pato.execute(Cmd.PRINT_COMMIT)
+        pato.execute(Cmd.PRINT_COMMIT, 0)
         time.sleep(2)
         pato.execute(Cmd.PRINT_SETADDR, 0)
         for pair in pairs(line2):
             pato.execute(Cmd.PRINT_PUT, ord(pair[0]), ord(pair[1]))
-        pato.execute(Cmd.PRINT_COMMIT)
+        pato.execute(Cmd.PRINT_COMMIT, 0)
 
 class UartTransport(NullTest):
     @classmethod
@@ -204,7 +229,7 @@ class BridgeTransport(NullTest):
     def setUpClass(cls):
         cls.logger = logger
         cls.transport = Bridge(slave_addr = 0x41,
-                               port = 'COM97',
+                               port = 'COM102',
                                baudrate = 57600,
                                timeout = 10)
         cls.query_method = cls.transport.query

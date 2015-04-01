@@ -153,12 +153,12 @@ Reset.register(Cmd.RESET)
 class PrintSetAddr(Reply):
     @classmethod
     def parse(cls, packet):
-         rc, cmd = super(PrintSetAddr, cls).parse(packet)
-         cls.assertTrue(cmd == Cmd.PRINT_SETADDR,
-                        "Unexpected command in reply: {}".format(cmd))
-         cls.assertTrue(rc != 0, "Unable to set print buffer address")
-         return rc
-    
+        rc, cmd = super(PrintSetAddr, cls).parse(packet)
+        cls.assertTrue(cmd == Cmd.PRINT_SETADDR,
+                       "Unexpected command in reply: {}".format(cmd))
+        cls.assertTrue(rc != 0, "Unable to set print buffer address")
+        return rc
+
 PrintSetAddr.register(Cmd.PRINT_SETADDR)
 
 class PrintGetAddr(Reply):
@@ -179,6 +179,17 @@ class PrintPut(Reply):
         return rc
     
 PrintPut.register(Cmd.PRINT_PUT)
+
+class PrintPutPtr(Reply):
+    @classmethod
+    def parse(cls, packet):
+        rc, cmd = super(PrintPutPtr, cls).parse(packet)
+        cls.assertTrue(cmd == Cmd.PRINT_PUT_PTR,
+                       "Unexpected command in reply: {}".format(cmd))
+        cls.assertTrue(rc != 0, "Unable to put into print buffer")
+        return rc
+
+PrintPutPtr.register(Cmd.PRINT_PUT_PTR)
 
 class PrintCommit(Reply):
     @classmethod

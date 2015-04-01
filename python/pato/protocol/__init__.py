@@ -3,7 +3,7 @@
 
 @brief Basic stuff for communication with Pato
 
-Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>. 
+Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>.
 All rights reserved.
 
 @page License
@@ -50,7 +50,8 @@ class Cmd:
     PRINT_GETADDR = 0x06
     PRINT_PUT = 0x07
     PRINT_COMMIT = 0x08
-    
+    PRINT_PUT_PTR = 0x09
+
 class Direct:
     CLR = 0x01
     HOME = 0x02

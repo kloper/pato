@@ -167,9 +167,18 @@ class PrintPut(Request):
     
 PrintPut.register(Cmd.PRINT_PUT)
 
+class PrintPutPtr(Request):
+    @classmethod
+    def compile(cls, offset):
+        return super(PrintPutPtr, cls).compile([offset & 0xff,
+                                                (offset >> 8) & 0xff])
+    
+PrintPutPtr.register(Cmd.PRINT_PUT_PTR)
+
 class PrintCommit(Request):
     @classmethod
-    def compile(cls):
-        return super(PrintCommit, cls).compile([0, 0])
-    
+    def compile(cls, offset):
+        return super(PrintCommit, cls).compile([offset & 0xff,
+                                                (offset >> 8) & 0xff])
+
 PrintCommit.register(Cmd.PRINT_COMMIT)
