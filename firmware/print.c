@@ -276,6 +276,8 @@ uint8_t hd44780_print_commit(uint16_t offset)
    args = memchr(print_buffer.buffer, 0, PATO_PRINT_BUFFER_SIZE);
    if( args == NULL )
       return 0;
+
+   args += 1;
    
    if( offset > 0 ) {
       if(offset < PATO_PRINT_BUFFER_SIZE ) 
@@ -285,7 +287,7 @@ uint8_t hd44780_print_commit(uint16_t offset)
    }
    
 #if defined(HAVE_PRINTF)      
-   vfprintf(&hd44780_out, (const char*)print_buffer.buffer, args+1);
+   vfprintf(&hd44780_out, (const char*)print_buffer.buffer, args);
 #else
    for( uint8_t *ch = print_buffer.buffer; ch < args; ch++ )
       if( hd44780_putchar(*ch, &hd44780_out) )
