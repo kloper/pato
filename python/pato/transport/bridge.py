@@ -74,10 +74,10 @@ class Bridge(object):
             
             elapsed = time.clock()
             if send_remaining + recv_remaining != 0:
-                print "send_remaining: {} status {:02x}".\
-                    format(send_remaining, send_status)
-                print "recv_remaining: {} status {:02x}".\
-                    format(recv_remaining, recv_status)
+                print("send_remaining: {} status {:02x}".\
+                        format(send_remaining, send_status))
+                print("recv_remaining: {} status {:02x}".\
+                        format(recv_remaining, recv_status))
                 continue
 
             return reply
