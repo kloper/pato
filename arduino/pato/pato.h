@@ -50,5 +50,6 @@ extern "C" {
 
 #include "pato/transport.h"
 #include "pato/client.h"
+#include "pato/print.h"
 
 #endif /* _pato_pato_h_ */

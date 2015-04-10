@@ -57,10 +57,18 @@ void setup() {
 uint32_t count = 0xffff;
 
 void loop() {
-   display.print("\fHello World\n");
-   display.print("\ta = %ld\n", count);
+   pato::print(display, "\fHello World\n");
+   pato::print(display, "\ta = %ld\n", count);
    count++;
-   display.print("\t\tb = %d, %x\n", 10, 20);
-   display.print("name = %s\n", "Pato");
+   pato::print(display, "\t\tb = %d, %x\n", 10, 20);
+
+   pato::print(display, "name = %s\n", "Pato");
+   delay(1000);
+
+   char *p = "Text";
+   pato::print(display, "\ftext = %s, %s\n", "Pato", p);
+   pato::print(display, "text2 = %ld, %s\npi = %f\n", count, p, 3.1465f);
+   pato::print(display, "%ld, %f, %s\n", count, 3.1465f, p);
+   delay(1000);
 }
 

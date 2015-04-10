@@ -60,25 +60,25 @@ public:
    
    Pato(const AbstractTransport &transport):
       m_transport(transport),
-      m_format_cache(NULL)
+      m_cache(NULL)
    {}
 
    uint8_t ping(uint8_t val) {
       if( query(PATO_CMD_PING, 0, val) )
          return m_reply.arg1;
-      return 0xff;
+      return 0;
    }
 
    uint8_t clear_screen() {
       if( query(PATO_CMD_DIRECT, PATO_DIRECT_CLR, 0) )
          return m_reply.arg0;
-      return 0xff;
+      return 0;
    }
 
    uint8_t return_home() {
       if( query(PATO_CMD_DIRECT, PATO_DIRECT_HOME, 0) )
          return m_reply.arg0;
-      return 0xff;
+      return 0;
    }
 
    uint8_t entry_mode_set(const bool shift_direction,
@@ -86,7 +86,7 @@ public:
       if( query(PATO_CMD_DIRECT, PATO_DIRECT_EMS,
                 (shift_direction ? 0x02 : 0) | (shift_subject ? 0x01 : 0)) )
          return m_reply.arg0;
-      return 0xff;
+      return 0;
    }
 
    uint8_t display_control(const bool display_on,
@@ -97,7 +97,7 @@ public:
                 (cursor_on ? 0x02 : 0)  |
                 (cursor_blink ? 0x01 : 0)) )
          return m_reply.arg0;
-      return 0xff;      
+      return 0; 
    }
 
    uint8_t shift_control(const bool display_shift,
@@ -106,31 +106,31 @@ public:
                 (display_shift ? 0x08 : 0) |
                 (right_shift ? 0x04 : 0)) )
          return m_reply.arg0;
-      return 0xff;      
+      return 0;      
    }
 
    uint8_t set_cgram_addr(const uint8_t addr) {
       if( query(PATO_CMD_DIRECT, PATO_DIRECT_CGADDR, addr & 0x3f) )
          return m_reply.arg0;
-      return 0xff;      
+      return 0;      
    }
 
    uint8_t set_ddram_addr(const uint8_t addr) {
       if( query(PATO_CMD_DIRECT, PATO_DIRECT_DDADDR, addr & 0x7f) )
          return m_reply.arg0;
-      return 0xff;      
+      return 0;      
    }
 
    uint8_t busy_wait() {
       if( query(PATO_CMD_DIRECT, PATO_DIRECT_BUSY_WAIT, 0) )
          return m_reply.arg0;
-      return 0xff;      
+      return 0;      
    }
    
    uint8_t display_write(const uint8_t data) {
       if( query(PATO_CMD_DIRECT, PATO_DIRECT_WRITE, data) )
          return m_reply.arg0;
-      return 0xff;      
+      return 0;      
    }
 
    uint8_t display_read(uint8_t &data) {
@@ -138,7 +138,7 @@ public:
          data = m_reply.arg1;
          return m_reply.arg0;
       }
-      return 0xff;      
+      return 0;      
    }
 
    uint8_t reset_display(const reset_type type = DEFAULT,
@@ -146,128 +146,48 @@ public:
       if( query(PATO_CMD_RESET, type, data) ) {
          return m_reply.arg0;
       }
-      return 0xff;      
+      return 0;      
    }
 
    uint8_t print_set_addr(const uint16_t addr) {
       if( query(PATO_CMD_PRINT_SETADDR, addr & 0xff, (addr>>8) & 0xff) ) {
          return m_reply.arg0;
       }
-      return 0xff;      
+      return 0;      
    }
 
-   uint8_t print_set_addr(uint16_t& addr) {
+   uint8_t print_get_addr(uint16_t& addr) {
       if( query(PATO_CMD_PRINT_GETADDR, 0, 0) ) {
-         addr = (m_reply.arg1 << 8) & m_reply.arg0;
+         addr = (m_reply.arg1 << 8) | m_reply.arg0;
          return 1;
       }
-      return 0xff;      
+      return 0;      
    }
 
-   uint8_t print_commit() {
-      if( query(PATO_CMD_PRINT_COMMIT, 0, 0) ) {
+   uint8_t print_commit(uint16_t offset) {
+      if( query(PATO_CMD_PRINT_COMMIT, offset & 0xff, (offset>>8) & 0xff) ) {
          return m_reply.arg0;
       }
-      return 0xff;      
+      return 0;      
    }
 
    uint8_t print_put(uint8_t a, uint8_t b) {
       if( query(PATO_CMD_PRINT_PUT, a, b) ) {
          return m_reply.arg0;
       }
-      return 0xff;      
+      return 0;      
    }
 
-   uint8_t print_upload(const uint8_t* begin, const uint8_t *end) {
-      uint8_t rc = 1;
-      uint8_t a, b;
-
-      while( begin != NULL && end != NULL && begin < end ) {
-         a = *begin++;
-         b = (begin < end) ? *begin++ : 0;
-         rc = print_put(a,b);
-         if( !rc ) return rc;            
+   uint8_t print_put_ptr(uint16_t offset) {
+      if( query(PATO_CMD_PRINT_PUT_PTR, offset & 0xff, (offset>>8) & 0xff) ) {
+         return m_reply.arg0;
       }
-      return rc;
+      return 0;      
    }
 
-   template <typename T>
-   uint8_t print_upload(const T &val) {
-      return print_upload((uint8_t*)&val, (uint8_t*)&val + sizeof(T));
-   }
-
-   template <typename T>
-   uint8_t print_upload(T *val) {
-      return print_upload((uint8_t*)val, (uint8_t*)(val+1));
-   }
-
-   uint8_t print_upload(const char *val) {
-      const char *last = val;
-      while(*last) last++; 
-      return print_upload((uint8_t*)val, (uint8_t*)(last+1));
-   }
-
-   uint8_t print_string(const char *format, const bool commit = true) {
-      uint8_t rc;
-      
-      if( !format )
-         return 0;     
-      
-      if( format != m_format_cache ) {
-         rc = print_set_addr(0);
-         if( !rc ) return rc;
-
-         m_format_cache = format;
-
-         rc = print_upload(format);
-         if( !rc ) return rc;
-      }
-
-      const char *last = format;
-      while(*last) last++;
-      rc = print_set_addr(last-format+1);
-      if( !rc ) return rc;
-
-      if( commit )
-         rc = print_commit();
-      return rc;
-   }
-
-   uint8_t print(const char *format) {
-      uint8_t rc = print_string(format, false);
-      if( !rc ) return rc;
-
-      rc = print_commit();
-      return rc;
-   }
-
-   template <typename A0>
-   uint8_t print(const char *format, const A0 &a0) {
-      uint8_t rc = print_string(format, false);
-      if( !rc ) return rc;
-      
-      rc = print_upload(a0);
-      if( !rc ) return rc;
-
-      rc = print_commit();
-      return rc;
-   }
-
-   template <typename A0, typename A1>
-   uint8_t print(const char *format, const A0 &a0, const A1 &a1) {
-      uint8_t rc = print_string(format, false);
-      if( !rc ) return rc;
-      
-      rc = print_upload(a0);
-      if( !rc ) return rc;
-
-      rc = print_upload(a1);
-      if( !rc ) return rc;
-
-      rc = print_commit();
-      return rc;
-   }
-
+   const char *cache() const { return m_cache; }
+   void cache(const char* str) { m_cache = str; }
+   
 protected:
    bool query(uint8_t cmd, uint8_t arg0, uint8_t arg1) {
       m_error = NO_ERROR;
@@ -300,7 +220,7 @@ protected:
    }
    
 private:
-   const char *m_format_cache;
+   const char *m_cache;
    packet_t m_request;
    packet_t m_reply;
    error_t m_error;
