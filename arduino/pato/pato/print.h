@@ -213,6 +213,115 @@ uint8_t print(Pato &pato, const char *format,
    return rc;
 }
 
+template <typename A0,
+          typename A1,
+          typename A2,
+          typename A3>
+uint8_t print(Pato &pato, const char *format,
+              const A0 &a0,
+              const A1 &a1,
+              const A2 &a2,
+              const A3 &a3)
+{
+   uint8_t rc = upload_format(pato, format);
+   if( !rc ) return rc;
+
+   uint16_t a0_offset = print_upload_content(pato, a0);
+   uint16_t a1_offset = print_upload_content(pato, a1);
+   uint16_t a2_offset = print_upload_content(pato, a2);
+   uint16_t a3_offset = print_upload_content(pato, a3);
+
+   uint16_t args_offset;
+   rc = pato.print_get_addr(args_offset);
+   if( !rc ) return rc;
+
+   if( a0_offset == 0xffff )
+      rc = print_upload(pato, a0);
+   else
+      rc = pato.print_put_ptr(a0_offset);
+   if( !rc ) return rc;
+
+   if( a1_offset == 0xffff )
+      rc = print_upload(pato, a1);
+   else
+      rc = pato.print_put_ptr(a1_offset);
+   if( !rc ) return rc;
+
+   if( a2_offset == 0xffff )
+      rc = print_upload(pato, a2);
+   else
+      rc = pato.print_put_ptr(a2_offset);
+   if( !rc ) return rc;
+
+   if( a3_offset == 0xffff )
+      rc = print_upload(pato, a3);
+   else
+      rc = pato.print_put_ptr(a3_offset);
+   if( !rc ) return rc;
+
+   rc = pato.print_commit(args_offset);
+   return rc;
+}
+
+template <typename A0,
+          typename A1,
+          typename A2,
+          typename A3,
+          typename A4>
+uint8_t print(Pato &pato, const char *format,
+              const A0 &a0,
+              const A1 &a1,
+              const A2 &a2,
+              const A3 &a3,
+              const A4 &a4)
+{
+   uint8_t rc = upload_format(pato, format);
+   if( !rc ) return rc;
+
+   uint16_t a0_offset = print_upload_content(pato, a0);
+   uint16_t a1_offset = print_upload_content(pato, a1);
+   uint16_t a2_offset = print_upload_content(pato, a2);
+   uint16_t a3_offset = print_upload_content(pato, a3);
+   uint16_t a4_offset = print_upload_content(pato, a4);
+
+   uint16_t args_offset;
+   rc = pato.print_get_addr(args_offset);
+   if( !rc ) return rc;
+
+   if( a0_offset == 0xffff )
+      rc = print_upload(pato, a0);
+   else
+      rc = pato.print_put_ptr(a0_offset);
+   if( !rc ) return rc;
+
+   if( a1_offset == 0xffff )
+      rc = print_upload(pato, a1);
+   else
+      rc = pato.print_put_ptr(a1_offset);
+   if( !rc ) return rc;
+
+   if( a2_offset == 0xffff )
+      rc = print_upload(pato, a2);
+   else
+      rc = pato.print_put_ptr(a2_offset);
+   if( !rc ) return rc;
+
+   if( a3_offset == 0xffff )
+      rc = print_upload(pato, a3);
+   else
+      rc = pato.print_put_ptr(a3_offset);
+   if( !rc ) return rc;
+
+   if( a4_offset == 0xffff )
+      rc = print_upload(pato, a4);
+   else
+      rc = pato.print_put_ptr(a4_offset);
+   if( !rc ) return rc;
+
+   rc = pato.print_commit(args_offset);
+   return rc;
+}
+
 }; // end of namespace pato
 
 #endif /* _pato_print_h_ */
