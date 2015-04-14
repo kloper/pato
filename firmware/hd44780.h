@@ -42,6 +42,8 @@
 
 /**
  * @defgroup hd44780_pins Atmega to HD44780 physical wiring
+ * @brief How to connect Atmega loaded with Pato to HD44780
+ *
  * In order to minimize number of physical connections with the display
  * Pato uses 4-bit data interface. For exact specification of the interface
  * please refer to [HD44780 Data-sheet](http://tinyurl.com/qxfogu9).
@@ -192,7 +194,8 @@
 
 /**
  * @defgroup hd44780_cmds Low level HD44780 interface 
- * 
+ * @brief Internal low level HD44780 device driver
+ *
  * Pato provides a small low-level library for controlling HD44780-based 
  * display. It can be used as a snad-alone module for other projects. 
  * It is imlemented in assembly with a goal to minimize flash memory usage 

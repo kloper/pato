@@ -42,6 +42,7 @@
 
 /**
  * @defgroup pato_protocol Pato Communication Protocol
+ * @brief How to communicate with Pato
  *
  * Pato defines very simple communication protocol that uses either UART
  * or I2C as a transport. The protocol is designed to minimize RAM usage.
