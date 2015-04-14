@@ -3,7 +3,7 @@
 
 @brief Basic stuff for constructing bridge packets
 
-Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>. 
+Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>.
 All rights reserved.
 
 @page License
@@ -47,7 +47,7 @@ from util.crc import crc16
 
 class Request(PacketBase):
     Registry = tree()
-    
+
     @classmethod
     def compile(cls, payload = []):
         res = [cls.cmd]+payload
@@ -60,21 +60,21 @@ class Request(PacketBase):
 
 class Reply(PacketBase):
     Registry = tree()
-    
+
     @classmethod
     def parse(cls, packet):
-        cls.assertTrue( packet[-1] == 0 and min(packet[:-1]) > 0,
+        cls.assert_true( packet[-1] == 0 and min(packet[:-1]) > 0,
                         "Packet is not COBS encoded: {}".format(packet) )
 
         packet = cobs.decode(packet)
         size = packet[0]
-        cls.assertTrue( size == len(packet)-3,
+        cls.assert_true( size == len(packet)-3,
                         msg = "Bad Size",
                         packet = packet)
 
-        
+
         crc = (packet[2] << 8) | packet[1]
-        cls.assertTrue( crc == crc16(packet[3:]),
+        cls.assert_true( crc == crc16(packet[3:]),
                         msg = "Bad CRC",
                         packet = packet)
 

@@ -3,7 +3,7 @@
 
 @brief basic stuff for protocol definitions
 
-Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>. 
+Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>.
 All rights reserved.
 
 @page License
@@ -38,6 +38,10 @@ official policies, either expressed or implied, of the Pato Project.
 """
 
 class ProtocolException(Exception):
+    """
+    Implementation specific Exception that normally designates packet
+    parsing or communication error.
+    """
     def __init__(self, *args, **kwargs):
         args += (kwargs,)
         Exception.__init__(self, *args)

@@ -3,7 +3,7 @@
 
 @brief Common utilies
 
-Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>. 
+Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>.
 All rights reserved.
 
 @page License
@@ -39,15 +39,33 @@ official policies, either expressed or implied, of the Pato Project.
 
 import struct
 
-def pairs(s):
-    strlen = len(s) + len(s)%2
-    s += "\0"
-    for i in xrange(0, strlen, 2):
-        yield s[i:i+2]
+def pairs(strn):
+    """
+    Generator that splits given string into sequence of pairs
+    of characters. If string contains odd number of characters
+    it is padded with 0 chars.
+
+    @param[in] strn string to be split into pairs
+    @returns on each invocation returns next pair of characters
+            from the string.
+    """
+    strlen = len(strn) + len(strn)%2
+    strn += "\0"
+    for i in range(0, strlen, 2):
+        yield strn[i:i+2]
 
 def int2str(val):
+    """
+    Convert unsigned short into little endian byte sequence
+    @param[in] val integer value
+    @returns byte string representing unsigned short
+    """
     return struct.pack("<H", val)
 
 def float2str(val):
+    """
+    Convert float value into little endian byte sequence
+    @param[in] val float value
+    @returns byte string representing float value
+    """
     return struct.pack("<f", float(val))
- 

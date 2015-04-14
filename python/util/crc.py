@@ -3,7 +3,7 @@
 
 @brief crc8 calculator for Pato packets
 
-Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>. 
+Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>.
 All rights reserved.
 
 @page License
@@ -37,12 +37,19 @@ are those of the authors and should not be interpreted as representing
 official policies, either expressed or implied, of the Pato Project.
 """
 
-import os
-import sys
-
 def _crc_update(crc, data, mask, const):
+    """
+    CRC8/16 update function taken from _crc_ibutton_update() function
+    found in "Atmel Toolchain/AVR8 GCC/Native/3.4.1061/
+    avr8-gnu-toolchain/avr/include/util/crc16.h" documentation.
+    @param[in] crc current CRC value
+    @param[in] data next byte of data
+    @param[in] mask CRC mask, must be 0xff for CRC8 and 0xffff for CRC16
+    @param[in] const CRC polynomial constant
+    @returns Next CRC value either 8 or 16 bit depending on mask
+    """
     crc = (crc & mask) ^ (data & 0xff)
-    for _ in xrange(8):
+    for _ in range(8):
         if crc & 1:
             crc = (crc >> 1) ^ const
         else:
@@ -50,12 +57,22 @@ def _crc_update(crc, data, mask, const):
     return crc & mask
 
 def crc8(data):
+    """
+    Calculate CRC8 as described in the util/crc16.h (see _crc_update())
+    @param[in] data input byte sequence
+    @returns Optimized Dallas (now Maxim) iButton 8-bit CRC
+    """
     crc = 0
     for c in data:
         crc = _crc_update(crc, c, 0xff, 0x8c)
     return crc
 
 def crc16(data):
+    """
+    Calculate CRC16 as described in the util/crc16.h (see _crc_update())
+    @param[in] data input byte sequence
+    @returns CRC16 of input byte sequence
+    """
     crc = 0
     for c in data:
         crc = _crc_update(crc, c, 0xffff, 0xA001)

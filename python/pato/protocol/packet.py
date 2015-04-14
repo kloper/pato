@@ -37,42 +37,88 @@ are those of the authors and should not be interpreted as representing
 official policies, either expressed or implied, of the Pato Project.
 """
 
-import pdb
-
 from util.packet import PacketBase, tree
 from util.crc import crc8
 
 from pato.protocol import Reply as ReplyVal
 
 class Request(PacketBase):
+    """
+    @brief Base class for all request packets.
+
+    In Java terms this is a static class. It introduces a single static
+    method Request.compile() that is able to make a valid ready to transfer
+    packet with arbitrary payload.
+
+    All request packets share the same registry. The registry is used by
+    PacketBase apparatus to find packet handles by id.
+
+    Id of request packet is id of associated command (see
+    @ref pato.protocol.Cmd). In case of DIRECT command, the id also includes
+    the sub-command (see @ref pato.protocol.Direct).
+    """
     Registry = tree()
 
     @classmethod
-    def compile(cls, payload = None):
-        cls.assertTrue( len(payload) <= 2, "Payload must be 2 bytes" )
+    def compile(cls, payload=None):
+        """
+        @brief Make request packet with arbitrary payload.
+
+        The command value for the packet is taken from Request.cmd that
+        is set by Request.register() command.
+        @param[in] payload sequence containing two bytes of payload
+        @returns list containing byte sequence representing the packet.
+        """
+        cls.assert_true(len(payload) <= 2, "Payload must be 2 bytes")
 
         res = [cls.cmd, payload[0], payload[1]]
         res += [crc8(res), 0]
         return res
 
 class Reply(PacketBase):
+    """
+    @brief Base class for all reply packets.
+
+    In Java terms this is a static class. It introduces a single static
+    method Reply.parse() that is able to verify reply packet and extract
+    its payload.
+
+    All reply packets share the same registry. The registry is used by
+    PacketBase apparatus to find packet handles by id.
+
+    Id of request packet is id of associated command (see
+    @ref pato.protocol.Cmd). In case of DIRECT command, the id also includes
+    the sub-command (see @ref pato.protocol.Direct).
+    """
     Registry = tree()
 
     @classmethod
     def parse(cls, packet):
-        cls.assertTrue( len(packet) == 5, "Packet length must be 5" )
+        """
+        @brief Take raw byte sequence verify it and return payload.
 
-        cls.assertTrue( packet[4] == 0,
-                         msg = "Bad separator",
-                         packet = packet)
+        The packet byte sequence is verified for CRC, separator value
+        (last zero). If any verification fails or when this is a valid error
+        packet this method will throw ProtocolException.
 
-        cls.assertTrue( packet[3] == crc8(packet[0:3]),
-                         msg = "Bad CRC",
-                         packet = packet)
+        @param[in] packet sequence containing reply packet
+        @returns list containing byte sequence of packet payload
+        @throws ProtocolException
+        """
 
-        cls.assertTrue( packet[0] != ReplyVal.ERROR,
-                         msg = "Error responce",
-                         error_code = packet[1],
-                         cmd = packet[2] )
+        cls.assert_true(len(packet) == 5, "Packet length must be 5")
+
+        cls.assert_true(packet[4] == 0,
+                        msg="Bad separator",
+                        packet=packet)
+
+        cls.assert_true(packet[3] == crc8(packet[0:3]),
+                        msg="Bad CRC",
+                        packet=packet)
+
+        cls.assert_true(packet[0] != ReplyVal.ERROR,
+                        msg="Error response",
+                        error_code=packet[1],
+                        cmd=packet[2] )
 
         return packet[1:3]

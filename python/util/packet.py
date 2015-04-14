@@ -3,7 +3,7 @@
 
 @brief basic stuff for constructing protocols
 
-Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>. 
+Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>.
 All rights reserved.
 
 @page License
@@ -37,42 +37,77 @@ are those of the authors and should not be interpreted as representing
 official policies, either expressed or implied, of the Pato Project.
 """
 
-import pdb
-
 from collections import defaultdict
 from util.protocol import ProtocolException
 
-def tree(): return defaultdict(tree)
+def tree():
+    """
+    Tree definition from https://gist.github.com/hrldcpr/2012250
+    """
+    return defaultdict(tree)
 
 class PacketBase(object):
+    """
+    Base class for constructing communication packets.
+    Implements simple registration mechanism that allows to find specific
+    handler classes according to packet contents.
+
+    Sub-classes shall call static PacketBase::register() with some sort of
+    unique id sequence to register themselves as handlers for that id.
+
+    Later, the main application loop uses PacketBase::find() to find the
+    appropriate handler for incoming or outgoing packets.
+    """
     @classmethod
     def register(cls, *args):
+        """
+        Register class (this is @b static method so class object is registered
+        not an instance of the class) object as handler for packets identified
+        by args.
+        @param[in] cls reference to the class object
+        @param[in] args unique id sequence
+        """
         assert len(args) > 0, "register expects one or more arguments"
-        reg = cls.Registry
+        reg = cls.Registry #pylint: disable=no-member
         for cmd in args[0:-1]:
             reg = reg[cmd]
-        assert args[-1] not in reg, "Command with ID {} is already registered".\
-            format(args)
+        assert args[-1] not in reg, \
+          "Command with ID {} is already registered".format(args)
         reg[args[-1]] = cls
         cls.cmd = args[0]
 
     @classmethod
     def find(cls, *args):
+        """
+        Find class object that is registered for unique sequence.
+        @param[in] cls reference to the base class object
+        @param[in] args unique id sequence
+        @returns Reference to specific class that is registered for that id.
+                 None if nothing found.
+        """
         assert len(args) > 0, "find expects one or more arguments"
-        reg = cls.Registry
+        reg = cls.Registry #pylint: disable=no-member
         for cmd in args:
             if cmd in reg:
                 reg = reg[cmd]
             else:
                 return None
         return reg
-        
+
     @staticmethod
-    def assertTrue(expr, *args, **kwargs):
+    def assert_true(expr, *args, **kwargs):
+        """
+        Utility assert that will throw ProtocolException
+        instead of AssertionError
+        """
         if not expr:
             raise ProtocolException(*args, **kwargs)
 
     @staticmethod
-    def assertFalse(expr, *args, **kwargs):
+    def assert_flase(expr, *args, **kwargs):
+        """
+        Utility assert that will throw ProtocolException
+        instead of AssertionError
+        """
         if expr:
             raise ProtocolException(*args, **kwargs)

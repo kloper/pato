@@ -4,7 +4,7 @@
 @brief Consistent Overhead Byte Stuffing
 See http://stuartcheshire.org/papers/COBSforToN.pdf
 
-Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>. 
+Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>.
 All rights reserved.
 
 @page License
@@ -38,10 +38,15 @@ are those of the authors and should not be interpreted as representing
 official policies, either expressed or implied, of the Pato Project.
 """
 
-import os
-import sys
-
 def seq_split(seq, val):
+    """
+    Generator function that splits input sequence by separator value.
+    Example: sequence [1,2,3,0,4,5] and val = 0 will produce
+    sub-sequences [1,2,3] and [4,5].
+    @param[in] seq input sequence
+    @param[in] val separator value
+    @returns next sub-sequence at each invocation
+    """
     res = []
     for item in seq:
         if item == val:
@@ -52,6 +57,14 @@ def seq_split(seq, val):
     yield res
 
 def seq_join(seq, val):
+    """
+    Flatten input sequence of lists into a single list. Insert separator
+    value if not None.
+    @param[in] seq sequence of lists
+    @param[in] val separator value, will be put between sub-sequences in the
+               resulting list if not None.
+    @returns resulting flattened list
+    """
     res = []
     for item in seq[:-1]:
         res.extend(item)
@@ -61,11 +74,22 @@ def seq_join(seq, val):
     return res
 
 def encode(seq):
+    """
+    COBS encode input byte sequence. The resulting sequence is at most
+    255 bytes long and does not contain zeros.
+    @param[in] seq input sequence that is interpreted as byte sequence
+    @returns resulting encoded sequence in a form of python list
+    """
     assert len(seq) < 255, "COBS content too long"
     assert len(seq) > 0, "COBS content too short"
-    return seq_join( [[len(s)+1]+s for s in seq_split(seq, 0)], None )
+    return seq_join([[len(s)+1]+s for s in seq_split(seq, 0)], None)
 
 def decode(seq):
+    """
+    COBS decode input byte sequence.
+    @param[in] seq input sequence that must to be COBS encoded.
+    @retruns resulting decoded sequence
+    """
     assert len(seq) > 0, "COBS content too short"
     res = []
     while seq:

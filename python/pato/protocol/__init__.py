@@ -41,6 +41,10 @@ import os
 import sys
 
 class Cmd:
+    """
+    @brief Enumerator of valid command codes
+    @see pato_protocol
+    """
     PING = 0x00
     DIRECT = 0x01
     RESET = 0x02
@@ -53,6 +57,10 @@ class Cmd:
     PRINT_PUT_PTR = 0x09
 
 class Direct:
+    """
+    @brief Enumerator of sub-commands for DIRECT command
+    @see pato_protocol
+    """
     CLR = 0x01
     HOME = 0x02
     EMS = 0x03
@@ -66,10 +74,19 @@ class Direct:
     READ = 0x0B
 
 class Reply:
+    """
+    @brief Enumerator of valid reply codes
+    @see pato_protocol
+    """
     OK = 0x00
     ERROR = 0xff
 
 class Error:
+    """
+    @brief Enumerator of valid error codes
+    @see pato_protocol
+    """
     CRC = 0x01
     BADCMD = 0x02
     BADARG = 0x03
+    SEP = 0x04
