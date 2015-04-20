@@ -41,6 +41,10 @@ from pato.protocol.packet import Reply
 from pato.protocol import Cmd, Direct
 
 class Ping(Reply):
+    """
+    @brief Ping reply packet parser
+    @see PATO_CMD_PING
+    """
     @classmethod
     def parse(cls, packet):
         arg0, arg1 = super(Ping, cls).parse(packet)
@@ -51,6 +55,10 @@ class Ping(Reply):
 Ping.register(Cmd.PING)
 
 class ClearScreen(Reply):
+    """
+    @brief DIRECT ClearScreen reply packet parser
+    @see PATO_DIRECT_CLR
+    """
     @classmethod
     def parse(cls, packet):
         arg0, _ = super(ClearScreen, cls).parse(packet)
@@ -59,6 +67,10 @@ class ClearScreen(Reply):
 ClearScreen.register(Cmd.DIRECT, Direct.CLR)
 
 class Home(Reply):
+    """
+    @brief DIRECT Home reply packet parser
+    @see PATO_DIRECT_HOME
+    """
     @classmethod
     def parse(cls, packet):
         arg0, _ = super(Home, cls).parse(packet)
@@ -67,6 +79,10 @@ class Home(Reply):
 Home.register(Cmd.DIRECT, Direct.HOME)
 
 class EntryModeSet(Reply):
+    """
+    @brief DIRECT EntryModeSet reply packet parser
+    @see PATO_DIRECT_EMS
+    """
     @classmethod
     def parse(cls, packet):
         arg0, _ = super(EntryModeSet, cls).parse(packet)
@@ -75,6 +91,10 @@ class EntryModeSet(Reply):
 EntryModeSet.register(Cmd.DIRECT, Direct.EMS)
 
 class DisplayControl(Reply):
+    """
+    @brief DIRECT DisplayControl reply packet parser
+    @see PATO_DIRECT_DCTRL
+    """
     @classmethod
     def parse(cls, packet):
         arg0, _ = super(DisplayControl, cls).parse(packet)
@@ -83,6 +103,10 @@ class DisplayControl(Reply):
 DisplayControl.register(Cmd.DIRECT, Direct.DCTRL)
 
 class Shift(Reply):
+    """
+    @brief DIRECT Shift reply packet parser
+    @see PATO_DIRECT_SHIFT
+    """
     @classmethod
     def parse(cls, packet):
         arg0, _ = super(Shift, cls).parse(packet)
@@ -91,6 +115,10 @@ class Shift(Reply):
 Shift.register(Cmd.DIRECT, Direct.SHIFT)
 
 class FunctionSet(Reply):
+    """
+    @brief DIRECT FunctionSet reply packet parser
+    @see PATO_DIRECT_FUNC
+    """
     @classmethod
     def parse(cls, packet):
         arg0, _ = super(FunctionSet, cls).parse(packet)
@@ -99,6 +127,10 @@ class FunctionSet(Reply):
 FunctionSet.register(Cmd.DIRECT, Direct.FUNC)
 
 class SetCGRAMAddr(Reply):
+    """
+    @brief DIRECT Set CGRAM Address reply packet parser
+    @see PATO_DIRECT_CGADDR
+    """
     @classmethod
     def parse(cls, packet):
         arg0, _ = super(SetCGRAMAddr, cls).parse(packet)
@@ -107,6 +139,10 @@ class SetCGRAMAddr(Reply):
 SetCGRAMAddr.register(Cmd.DIRECT, Direct.CGADDR)
 
 class SetDDRAMAddr(Reply):
+    """
+    @brief DIRECT Set DDRAM Address reply packet parser
+    @see PATO_DIRECT_DDADDR
+    """
     @classmethod
     def parse(cls, packet):
         arg0, _ = super(SetDDRAMAddr, cls).parse(packet)
@@ -115,6 +151,10 @@ class SetDDRAMAddr(Reply):
 SetDDRAMAddr.register(Cmd.DIRECT, Direct.DDADDR)
 
 class Wait(Reply):
+    """
+    @brief DIRECT Busy Wait reply packet parser
+    @see PATO_DIRECT_BUSY_WAIT
+    """
     @classmethod
     def parse(cls, packet):
         arg0, _ = super(Wait, cls).parse(packet)
@@ -123,6 +163,10 @@ class Wait(Reply):
 Wait.register(Cmd.DIRECT, Direct.BUSY_WAIT)
 
 class Write(Reply):
+    """
+    @brief DIRECT Write reply packet parser
+    @see PATO_DIRECT_WRITE
+    """
     @classmethod
     def parse(cls, packet):
         arg0, _ = super(Write, cls).parse(packet)
@@ -131,6 +175,10 @@ class Write(Reply):
 Write.register(Cmd.DIRECT, Direct.WRITE)
 
 class Read(Reply):
+    """
+    @brief DIRECT Read reply packet parser
+    @see PATO_DIRECT_READ
+    """
     @classmethod
     def parse(cls, packet):
         arg0, arg1 = super(Read, cls).parse(packet)
@@ -139,6 +187,10 @@ class Read(Reply):
 Read.register(Cmd.DIRECT, Direct.READ)
 
 class Reset(Reply):
+    """
+    @brief Reset Display reply packet parser
+    @see PATO_CMD_RESET
+    """
     @classmethod
     def parse(cls, packet):
         rc, cmd = super(Reset, cls).parse(packet)
@@ -149,6 +201,10 @@ class Reset(Reply):
 Reset.register(Cmd.RESET)
 
 class PrintSetAddr(Reply):
+    """
+    @brief Print Set Address reply packet parser
+    @see PATO_CMD_PRINT_SETADDR
+    """
     @classmethod
     def parse(cls, packet):
         rc, cmd = super(PrintSetAddr, cls).parse(packet)
@@ -160,6 +216,10 @@ class PrintSetAddr(Reply):
 PrintSetAddr.register(Cmd.PRINT_SETADDR)
 
 class PrintGetAddr(Reply):
+    """
+    @brief Print Get Address reply packet parser
+    @see PATO_CMD_PRINT_GETADDR
+    """
     @classmethod
     def parse(cls, packet):
         b0, b1 = super(PrintGetAddr, cls).parse(packet)
@@ -168,6 +228,10 @@ class PrintGetAddr(Reply):
 PrintGetAddr.register(Cmd.PRINT_GETADDR)
 
 class PrintPut(Reply):
+    """
+    @brief Print Put reply packet parser
+    @see PATO_CMD_PRINT_PUT
+    """
     @classmethod
     def parse(cls, packet):
         rc, cmd = super(PrintPut, cls).parse(packet)
@@ -179,6 +243,10 @@ class PrintPut(Reply):
 PrintPut.register(Cmd.PRINT_PUT)
 
 class PrintPutPtr(Reply):
+    """
+    @brief Print Put Pointer reply packet parser
+    @see PATO_CMD_PRINT_PUT_PTR
+    """
     @classmethod
     def parse(cls, packet):
         rc, cmd = super(PrintPutPtr, cls).parse(packet)
@@ -190,6 +258,10 @@ class PrintPutPtr(Reply):
 PrintPutPtr.register(Cmd.PRINT_PUT_PTR)
 
 class PrintCommit(Reply):
+    """
+    @brief Print Commit reply packet parser
+    @see PATO_CMD_PRINT_COMMIT
+    """
     @classmethod
     def parse(cls, packet):
         rc, cmd = super(PrintCommit, cls).parse(packet)
