@@ -1,9 +1,9 @@
 # -*- python -*-
 """@file
 
-@brief Bridge driver
+@brief Basic stuff for bridge driver
 
-Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>. 
+Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>.
 All rights reserved.
 
 @page License
@@ -41,12 +41,20 @@ import os
 import sys
 
 class Cmd:
+    """
+    @brief Enumerator of valid command codes
+    @see bridge_protocol
+    """
     PING = 1
-    TWI_CONFIG = 2	 
+    TWI_CONFIG = 2
     TWI_MASTER_SEND = 3
     TWI_MASTER_RECV = 4
 
 class Error:
+    """
+    @brief Enumerator of valid error codes
+    @see bridge_protocol
+    """
     COBS = 0x01
     CRC = 0x02
     BADCMD = 0x03

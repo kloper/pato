@@ -37,17 +37,19 @@ are those of the authors and should not be interpreted as representing
 official policies, either expressed or implied, of the Pato Project.
 """
 
-import pdb
-
 from bridge.protocol.packet import Reply
 from bridge.protocol import Cmd
 
 class Ping(Reply):
+    """
+    @brief Ping reply packet parser
+    @see PATO_BRIDGE_CMD_PING
+    """
     @classmethod
     def parse(cls, packet):
         cmd, content = super(Ping, cls).parse(packet)
-        cls.assert_true( cmd == Cmd.PING and len(content) == 4,
-                        "Ping received wrong reply: {}".format(packet) )
+        cls.assert_true(cmd == Cmd.PING and len(content) == 4,
+                        "Ping received wrong reply: {}".format(packet))
         return \
             (content[3] << 24)|\
             (content[2] << 16)|\
@@ -57,33 +59,45 @@ class Ping(Reply):
 Ping.register(Cmd.PING)
 
 class TwiConfig(Reply):
+    """
+    @brief WMI Config reply packet parser
+    @see PATO_BRIDGE_CMD_TWI_CONFIG
+    """
     @classmethod
     def parse(cls, packet):
         cmd, content = super(TwiConfig, cls).parse(packet)
-        cls.assert_true( cmd == Cmd.TWI_CONFIG and len(content) == 0,
-                        "TWI CONFIG received wrong reply: {}".format(packet) )
+        cls.assert_true(cmd == Cmd.TWI_CONFIG and len(content) == 0,
+                        "TWI CONFIG received wrong reply: {}".format(packet))
         return None
 
 TwiConfig.register(Cmd.TWI_CONFIG)
 
 class TwiMasterSend(Reply):
+    """
+    @brief TWI Master Send reply packet parser
+    @see PATO_BRIDGE_CMD_TWI_MASTER_SEND
+    """
     @classmethod
     def parse(cls, packet):
         cmd, content = super(TwiMasterSend, cls).parse(packet)
-        cls.assert_true( cmd == Cmd.TWI_MASTER_SEND and len(content) == 2,
+        cls.assert_true(cmd == Cmd.TWI_MASTER_SEND and len(content) == 2,
                         "TWI MASTER SEND received wrong reply: {}".\
-                        format(packet) )
+                        format(packet))
         return (content[0], content[1])
 
 TwiMasterSend.register(Cmd.TWI_MASTER_SEND)
 
 class TwiMasterRecv(Reply):
+    """
+    @brief TWI Master Receive reply packet parser
+    @see PATO_BRIDGE_CMD_TWI_MASTER_RECV
+    """
     @classmethod
     def parse(cls, packet):
         cmd, content = super(TwiMasterRecv, cls).parse(packet)
-        cls.assert_true( cmd == Cmd.TWI_MASTER_RECV and len(content) >= 2,
+        cls.assert_true(cmd == Cmd.TWI_MASTER_RECV and len(content) >= 2,
                         "TWI MASTER RECV received wrong reply: {}".\
-                        format(packet) )
+                        format(packet))
         return (content[0], content[1], content[2:])
 
 TwiMasterRecv.register(Cmd.TWI_MASTER_RECV)
