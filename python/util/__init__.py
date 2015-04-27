@@ -69,3 +69,12 @@ def float2str(val):
     @returns byte string representing float value
     """
     return struct.pack("<f", float(val))
+
+builtin_range = range #pylint: disable=invalid-name
+range = builtin_range #pylint: disable=invalid-name,redefined-builtin
+
+try:
+    xrange #pylint: disable=pointless-statement,undefined-variable
+    range = xrange #pylint: disable=undefined-variable
+except NameError:
+    pass
