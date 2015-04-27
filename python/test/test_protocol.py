@@ -3,7 +3,7 @@
 
 @brief test for protocol stuff
 
-Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>. 
+Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>.
 All rights reserved.
 
 @page License
@@ -41,73 +41,73 @@ import os
 import sys
 import pdb
 import unittest
-import traceback
 import time
-import serial
 import math
-import struct
 
-localdir = os.path.dirname( os.path.realpath(__file__) )
-sys.path.append( os.path.join( localdir, '..') )
+localdir = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(localdir, '..'))
 
 from pato import Pato
 from pato.protocol import Cmd, Direct
 from pato.transport.uart import Uart
 from pato.transport.bridge import Bridge, ProtocolException
 
-from util import float2str, int2str, pairs
+from util import float2str, int2str, pairs, range as xrange
 
 from bridge.protocol import Cmd as BridgeCmd
 
 from test import logger
 
-class NullTest(unittest.TestCase):    
+class NullTest(unittest.TestCase):
+    transport = None
+    logger = None
+
     def test_ping(self):
         pato = Pato(self.transport)
-        for i in xrange(10000):
+        for i in xrange(200):
             rc = pato.execute(Cmd.PING, i & 0xff)
-            self.logger.info("pong: {}".format(rc))
-            self.assertTrue(rc == (i + 1) & 0xff )
+            self.logger.info("pong: %s", rc)
+            self.assertTrue(rc == (i + 1) & 0xff)
 
     def test_write(self):
         pato = Pato(self.transport)
-        for s in [ "Hello World", "!!!Hello World"]:
-            for c in s:
+        for txt in ["Hello World", "!!!Hello World"]:
+            for c in txt:
                 rc = pato.execute(Cmd.DIRECT, Direct.WRITE, ord(c))
-                pdb.set_trace()
-            
+                # pdb.set_trace()
+
     def test_read(self):
         pato = Pato(self.transport)
 
         self.reset_pato(pato)
-        
-        str = "Hello World"
-        for c in str:
+
+        txt = "Hello World"
+        for c in txt:
             rc = pato.execute(Cmd.DIRECT, Direct.WRITE, ord(c))
-            
+
         pato.execute(Cmd.DIRECT, Direct.DDADDR, 0)
-        pato.execute(Cmd.DIRECT, Direct.READ)
 
         res = ""
-        for _ in xrange(len(str)):
+        for _ in xrange(len(txt)):
             (addr, char) = pato.execute(Cmd.DIRECT, Direct.READ)
             res += chr(char)
 
-        self.assertTrue( res == str )
+        pdb.set_trace()
+        self.assertTrue(res == txt)
 
     def reset_pato(self, pato):
         pato.execute(Cmd.RESET, 0)
         pato.execute(Cmd.DIRECT, Direct.DCTRL, True, True, True)
         pato.execute(Cmd.DIRECT, Direct.EMS, True, False)
-        
+
     def test_print(self):
         pato = Pato(self.transport)
 
         self.reset_pato(pato)
 
         pato.execute(Cmd.PRINT_SETADDR, 0)
-        str = "Hello World!!! 1 2 3 4 5 \0"
-        for pair in pairs(str):
+        txt = "Hello World!!! 1 2 3 4 5 \0"
+        for pair in pairs(txt):
             pato.execute(Cmd.PRINT_PUT, ord(pair[0]), ord(pair[1]))
         pato.execute(Cmd.PRINT_COMMIT, 0)
 
@@ -132,10 +132,10 @@ class NullTest(unittest.TestCase):
 
             for pair in pairs(int2str(len(name))):
                 pato.execute(Cmd.PRINT_PUT, ord(pair[0]), ord(pair[1]))
-            
+
             pato.execute(Cmd.PRINT_COMMIT, params_offset)
             time.sleep(1)
-            
+
     def test_print_ex(self):
         pato = Pato(self.transport)
 
@@ -146,8 +146,8 @@ class NullTest(unittest.TestCase):
                  "Counter B %08x ----\n" \
                  "Counter C %d $$$$\n" \
                  "Total: %d\0"
-        str = prefix+int2str(0)+int2str(0)+int2str(0)+int2str(0)
-        for pair in pairs(str):
+        txt = prefix+int2str(0)+int2str(0)+int2str(0)+int2str(0)
+        for pair in pairs(txt):
             pato.execute(Cmd.PRINT_PUT, ord(pair[0]), ord(pair[1]))
 
         for i in xrange(30):
@@ -162,7 +162,7 @@ class NullTest(unittest.TestCase):
                                  total & 0xff,
                                  (total >> 8) & 0xff)
                     pato.execute(Cmd.PRINT_COMMIT, 0)
-                    
+
     def test_print_float(self):
         pato = Pato(self.transport)
 
@@ -171,7 +171,7 @@ class NullTest(unittest.TestCase):
         pato.execute(Cmd.PRINT_SETADDR, 0)
         def send(prefix, t, sin, cos, tan):
             s = prefix + float2str(t) + float2str(sin) + \
-                float2str(cos) + float2str(tan) 
+                float2str(cos) + float2str(tan)
             for pair in pairs(s):
                 pato.execute(Cmd.PRINT_PUT, ord(pair[0]), ord(pair[1]))
 
@@ -181,13 +181,13 @@ class NullTest(unittest.TestCase):
                  "tan(t) = %f\0"
 
         send(prefix, 0, 0, 0, 0)
-        
+
         for i in xrange(10000):
             t = i * 0.001
             pato.execute(Cmd.PRINT_SETADDR, len(prefix))
             send("", t, math.sin(t), math.cos(t), math.tan(t))
             pato.execute(Cmd.PRINT_COMMIT, 0)
-                    
+
     def test_print_overrun(self):
         pato = Pato(self.transport)
 
@@ -216,38 +216,36 @@ class UartTransport(NullTest):
     @classmethod
     def setUpClass(cls):
         cls.logger = logger
-        cls.transport = Uart(port = 'COM83',
-                             baudrate = 9600,
-                             timeout = 10)
-        
+        cls.transport = Uart(port='COM83', baudrate=9600, timeout=10)
+
     @classmethod
     def tearDownClass(cls):
-        cls.transport.close()                
+        cls.transport.close()
 
 class BridgeTransport(NullTest):
     @classmethod
     def setUpClass(cls):
         cls.logger = logger
-        cls.transport = Bridge(slave_addr = 0x41,
-                               port = 'COM102',
-                               baudrate = 57600,
-                               timeout = 10)
+        cls.transport = Bridge(slave_addr=0x41,
+                               port='COM102',
+                               baudrate=57600,
+                               timeout=10)
         cls.query_method = cls.transport.query
 
     @classmethod
     def tearDownClass(cls):
-        cls.transport.close()                
+        cls.transport.close()
 
     def tearDown(self):
-        self.transport.query =  self.query_method
-        
+        self.transport.query = self.query_method
+
     def out_of_sync_query(self, request):
         (status, remaining) = self.transport.bridge.execute(
             BridgeCmd.TWI_MASTER_SEND,
             self.transport.slave_addr,
             request,
             0)
-        
+
         assert remaining == 0, "Failed to send req #1"
         (status, remaining) = self.transport.bridge.execute(
             BridgeCmd.TWI_MASTER_SEND,
@@ -256,7 +254,7 @@ class BridgeTransport(NullTest):
             0)
 
         assert remaining != 0, "Req #2 succeeded while shouldn't"
-        
+
         (status, remaining) = self.transport.bridge.execute(
             BridgeCmd.TWI_MASTER_SEND,
             self.transport.slave_addr,
@@ -264,7 +262,7 @@ class BridgeTransport(NullTest):
             0)
 
         assert remaining != 0, "Req #3 succeeded while shouldn't"
-        
+
         time.sleep(0.3)
         (status, remaining, reply) = self.transport.bridge.execute(
             BridgeCmd.TWI_MASTER_RECV,
@@ -280,7 +278,7 @@ class BridgeTransport(NullTest):
 
         assert remaining == 0, "Failed to receive reply #2"
         assert sum(reply2) == 0, "Reply #2 has non-zero bytes"
-        
+
         return reply
 
     def short_packet_query(self, request):
@@ -288,7 +286,7 @@ class BridgeTransport(NullTest):
             setattr(self, 'count', 0)
 
         self.count += 1
-        
+
         (status, remaining) = self.transport.bridge.execute(
             BridgeCmd.TWI_MASTER_SEND,
             self.transport.slave_addr,
@@ -307,11 +305,10 @@ class BridgeTransport(NullTest):
         self.transport.query = self.out_of_sync_query
         return self.test_ping()
 
-    def test_short_ping(self):        
+    def test_short_ping(self):
         self.transport.query = self.short_packet_query
 
         pato = Pato(self.transport)
         for i in xrange(10000):
             self.assertRaises(ProtocolException,
                               pato.execute, Cmd.PING, i & 0xff)
-    

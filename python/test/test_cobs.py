@@ -3,7 +3,7 @@
 
 @brief test util.cobs
 
-Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>. 
+Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>.
 All rights reserved.
 
 @page License
@@ -39,14 +39,12 @@ official policies, either expressed or implied, of the Pato Project.
 
 import os
 import sys
-import pdb
 import unittest
-import traceback
 
-localdir = os.path.dirname( os.path.realpath(__file__) )
-sys.path.append( os.path.join( localdir, '..') )
+localdir = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(localdir, '..'))
 
-from util.cobs import encode, decode, seq_join, seq_split
+from util.cobs import encode, decode, seq_join
 
 class CobsTest(unittest.TestCase):
     def test_encode_decode(self):
@@ -72,7 +70,7 @@ class CobsTest(unittest.TestCase):
         self.assertTrue(len(enc) == 2, "invalid enc len")
         dec = decode(enc)
         self.assertTrue(cmp(content,dec) == 0, "invalid dec")
-        
+
     def test_chunk_length_bounds(self):
         content = []
         self.assertRaises(AssertionError, encode, content)
@@ -80,4 +78,4 @@ class CobsTest(unittest.TestCase):
         content = [1]*255
         self.assertRaises(AssertionError, encode, content)
         dec = decode(content)
-        self.assertTrue( len(dec) != 0, "invalid dec") 
+        self.assertTrue( len(dec) != 0, "invalid dec")

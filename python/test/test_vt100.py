@@ -3,7 +3,7 @@
 
 @brief test v100 stuff
 
-Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>. 
+Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>.
 All rights reserved.
 
 @page License
@@ -39,33 +39,27 @@ official policies, either expressed or implied, of the Pato Project.
 
 import os
 import sys
-import pdb
 import unittest
-import traceback
-import time
-import serial
-import math
-import struct
 
-localdir = os.path.dirname( os.path.realpath(__file__) )
-sys.path.append( os.path.join( localdir, '..') )
+localdir = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(localdir, '..'))
 
 from pato import Pato
 from pato.protocol import Cmd, Direct
 from pato.transport.uart import Uart
-from pato.transport.bridge import Bridge, ProtocolException
+from pato.transport.bridge import Bridge
 
-from bridge.protocol import Cmd as BridgeCmd    
-
-from util import pairs, int2str
+from util import pairs, range as xrange
 from test import logger
 
 class NullTest(unittest.TestCase):
+    transport = None
+
     def reset_pato(self, pato):
         pato.execute(Cmd.RESET, 0)
         pato.execute(Cmd.DIRECT, Direct.DCTRL, True, True, True)
         pato.execute(Cmd.DIRECT, Direct.EMS, True, False)
-    
+
     def test_tab(self):
         pato = Pato(self.transport)
 
@@ -80,34 +74,33 @@ class NullTest(unittest.TestCase):
 
         for i in xrange(100):
             pato.execute(Cmd.PRINT_SETADDR, len(prefix))
-            for j in xrange(1,5):
-                pato.execute(Cmd.PRINT_PUT,  (i+j) & 0xff, ((i+j) >> 8) & 0xff)
-            pato.execute(Cmd.PRINT_COMMIT)
-                    
+            for j in xrange(1, 5):
+                pato.execute(Cmd.PRINT_PUT, (i+j) & 0xff, ((i+j) >> 8) & 0xff)
+            pato.execute(Cmd.PRINT_COMMIT, 0)
+
 
 class UartTransport(NullTest):
     @classmethod
     def setUpClass(cls):
         cls.logger = logger
-        cls.transport = Uart(port = 'COM83',
-                             baudrate = 9600,
-                             timeout = 10)
-        
+        cls.transport = Uart(port='COM83',
+                             baudrate=9600,
+                             timeout=10)
+
     @classmethod
     def tearDownClass(cls):
-        cls.transport.close()                
+        cls.transport.close()
 
 class BridgeTransport(NullTest):
     @classmethod
     def setUpClass(cls):
         cls.logger = logger
-        cls.transport = Bridge(slave_addr = 0x41,
-                               port = 'COM97',
-                               baudrate = 57600,
-                               timeout = 10)
+        cls.transport = Bridge(slave_addr=0x41,
+                               port='COM102',
+                               baudrate=57600,
+                               timeout=10)
         cls.query_method = cls.transport.query
 
     @classmethod
     def tearDownClass(cls):
-        cls.transport.close()                
-
+        cls.transport.close()

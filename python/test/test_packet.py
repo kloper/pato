@@ -3,7 +3,7 @@
 
 @brief driver for sending raw packets to pato
 
-Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>. 
+Copyright (c) 2014-2015 Dimitry Kloper <kloper@users.sf.net>.
 All rights reserved.
 
 @page License
@@ -41,15 +41,13 @@ import os
 import sys
 import pdb
 import unittest
-import traceback
-import time
 import serial
 
-localdir = os.path.dirname( os.path.realpath(__file__) )
-sys.path.append( os.path.join( localdir, '..') )
+localdir = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(localdir, '..'))
 
 import pato.protocol as protocol
-from pato.protocol.crc import crc8
+from util.crc import crc8
 
 from test import logger
 
@@ -57,18 +55,18 @@ class Test(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.logger = logger
-        cls.transport = serial.Serial(port = 'COM83',
-                                      baudrate = 9600,
-                                      timeout = 10)
+        cls.transport = serial.Serial(port='COM102',
+                                      baudrate=9600,
+                                      timeout=10)
 
     @classmethod
     def tearDownClass(cls):
-        cls.transport.close()                
+        cls.transport.close()
 
     def test_send_single_ping(self):
-        packet = [ protocol.Cmd.PING, 0, 0 ]
-        packet += [ crc8(packet), 0 ]
-        packet = "".join( [chr(c) for c in packet] )
+        packet = [protocol.Cmd.PING, 0, 0]
+        packet += [crc8(packet), 0]
+        packet = "".join([chr(c) for c in packet])
 
         pdb.set_trace()
         self.transport.write(packet)
