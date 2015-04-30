@@ -120,6 +120,10 @@ int main(int argc, char *argv[])
 
    sei();
 
+#if defined(HAVE_PRINT)
+   hd44780_print_reset();
+#endif /* HAVE_PRINT */
+   
    reply = (packet_t*)comm_outbuf();
 
    while(1) {
@@ -212,6 +216,11 @@ int main(int argc, char *argv[])
                cli();
 	       hd44780_reset(cmd);
                sei();
+
+#if defined(HAVE_PRINT)
+               hd44780_print_reset();
+#endif /* HAVE_PRINT */
+               
 	       reply->cmd = PATO_REPLY_OK;
 	       reply->arg0 = cmd;
 	       reply->arg1 = packet->cmd;

@@ -242,6 +242,19 @@ static int hd44780_putchar(char c, FILE *stream)
 static print_buffer_t print_buffer = { .addr = 0, .buffer = { 0 } };
 
 /**
+ * @brief Reset print buffer state.
+ *
+ * Clear print buffer content and current address and clear the screen.
+ */
+void hd44780_print_reset()
+{
+   print_buffer.addr = 0;
+   *print_buffer.buffer = 0;
+   
+   clear_screen();
+}
+
+/**
  * @brief Flush print buffer into display, applying formatting (if available)
  *
  * Without printf support, interpret the print buffer just a null terminated 

@@ -85,6 +85,7 @@ extern uint8_t hd44780_print_set_addr(uint16_t addr);
 extern uint16_t hd44780_print_get_addr();
 extern uint8_t hd44780_print_put(uint8_t arg0, uint8_t arg1);
 extern uint8_t hd44780_print_put_ptr(uint16_t offset);
+extern void hd44780_print_reset();
 
 #endif /* HAVE_PRINT */
 
