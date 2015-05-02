@@ -88,7 +88,7 @@ void uart_init()
    set_sleep_mode(SLEEP_MODE_IDLE);   
    
    {
-      uint32_t baudrate = eeprom_read_dword(&uart_baudrate);
+      uint32_t baudrate = eeprom_read_dword(&g_pato_config.uart_baudrate);
       uint32_t ubrr = F_CPU/16/baudrate-1;
       uint32_t approx_baudrate = F_CPU/16/(ubrr+1);
 
@@ -106,7 +106,7 @@ void uart_init()
   /* Select parity */
 
   {
-     uint8_t parity = eeprom_read_byte(&uart_parity);
+     uint8_t parity = eeprom_read_byte(&g_pato_config.uart_parity);
 
      switch(parity) {
 	case 1:
@@ -121,7 +121,7 @@ void uart_init()
   /* 1 or 2 stop bits */
 
   {
-     uint8_t stopbits = eeprom_read_byte(&uart_stopbits);
+     uint8_t stopbits = eeprom_read_byte(&g_pato_config.uart_stopbits);
 
      if( stopbits == 2 ) {
 	ucsr0c |= (1 << USBS0);                  /* Two stop bits */
@@ -131,7 +131,7 @@ void uart_init()
 
   /* Word size */
   {
-     uint8_t databits = eeprom_read_byte(&uart_databits);
+     uint8_t databits = eeprom_read_byte(&g_pato_config.uart_databits);
      switch(databits) {
 	case 5:
 	   break;

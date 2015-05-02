@@ -81,13 +81,13 @@ static tty_state_t tty_state = { .skip_til_nl = 0 };
 
 static tty_coord_t addr2coord(uint8_t addr)
 {
-   uint8_t height = eeprom_read_byte(&tty_height);
+   uint8_t height = eeprom_read_byte(&g_pato_config.tty_height);
    uint8_t i;
    tty_coord_t coord = { .x = 0, .y = 0 };
 
    for( i = 0; i < height; i++ ) {
-      uint8_t begin = eeprom_read_byte(&tty_linemap[i*2]);
-      uint8_t end = eeprom_read_byte(&tty_linemap[i*2+1]);
+      uint8_t begin = eeprom_read_byte(&g_pato_config.tty_linemap[i*2]);
+      uint8_t end = eeprom_read_byte(&g_pato_config.tty_linemap[i*2+1]);
       if(addr >= begin && addr < end) {
 	 coord.x = addr - begin;
 	 coord.y = i;
@@ -101,13 +101,13 @@ static tty_coord_t addr2coord(uint8_t addr)
 
 static uint8_t coord2addr(tty_coord_t coord)
 {
-   uint8_t height = eeprom_read_byte(&tty_height);
+   uint8_t height = eeprom_read_byte(&g_pato_config.tty_height);
    uint8_t begin, end;
 
    if( coord.y >= height )
       coord.y = height-1;
-   begin = eeprom_read_byte(&tty_linemap[coord.y*2]);
-   end = eeprom_read_byte(&tty_linemap[coord.y*2+1]);
+   begin = eeprom_read_byte(&g_pato_config.tty_linemap[coord.y*2]);
+   end = eeprom_read_byte(&g_pato_config.tty_linemap[coord.y*2+1]);
    if(coord.x >= end-begin)
       coord.x = end-1;
    return (begin+coord.x);
@@ -115,7 +115,7 @@ static uint8_t coord2addr(tty_coord_t coord)
 
 static tty_coord_t coord_add(tty_coord_t coord, int8_t dx, int8_t dy)
 {
-   uint8_t height = eeprom_read_byte(&tty_height), width;
+   uint8_t height = eeprom_read_byte(&g_pato_config.tty_height), width;
    uint8_t begin, end;
 
    coord.x += dx;
@@ -126,8 +126,8 @@ static tty_coord_t coord_add(tty_coord_t coord, int8_t dx, int8_t dy)
    while(coord.y < 0)
       coord.y += height;
 
-   begin = eeprom_read_byte(&tty_linemap[coord.y*2]);
-   end = eeprom_read_byte(&tty_linemap[coord.y*2+1]);
+   begin = eeprom_read_byte(&g_pato_config.tty_linemap[coord.y*2]);
+   end = eeprom_read_byte(&g_pato_config.tty_linemap[coord.y*2+1]);
    width = end-begin;
    
    while(coord.x >= width)
@@ -142,8 +142,8 @@ static tty_coord_t line_edge(tty_coord_t coord, int dest)
 {
    uint8_t begin, end;
 
-   begin = eeprom_read_byte(&tty_linemap[coord.y*2]);
-   end = eeprom_read_byte(&tty_linemap[coord.y*2+1]);
+   begin = eeprom_read_byte(&g_pato_config.tty_linemap[coord.y*2]);
+   end = eeprom_read_byte(&g_pato_config.tty_linemap[coord.y*2+1]);
 
    if(dest)
       coord.x = 0;
@@ -175,7 +175,9 @@ static int hd44780_putchar(char c, FILE *stream)
 {
    uint8_t paddr, naddr;
    tty_coord_t pcoord, ncoord;
-   tty_policy_t policy = { .data = eeprom_read_byte(&tty_policy) };
+   tty_policy_t policy = {
+      .data = eeprom_read_byte(&g_pato_config.tty_policy)
+   };
    
    paddr = hd44780_wait_busy();
    pcoord = addr2coord(paddr);

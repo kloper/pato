@@ -136,10 +136,10 @@ ISR(TWI_vect)
 
 void twi_init()
 {
-   uint32_t baudrate = eeprom_read_dword(&twi_baudrate);
+   uint32_t baudrate = eeprom_read_dword(&g_pato_config.twi_baudrate);
    uint32_t twbr = (F_CPU / baudrate - 16) / 2;
    uint8_t twsr = 0;
-   uint8_t twar = eeprom_read_byte(&twi_slaveaddr);
+   uint8_t twar = eeprom_read_byte(&g_pato_config.twi_slaveaddr);
    
    while(twbr > 0xff && twsr < 4) {
       twbr /= 2;

@@ -73,23 +73,54 @@
 
 #ifndef __ASSEMBLY__
 
-#if defined(HAVE_UART)
-extern uint32_t EEMEM uart_baudrate;
-extern uint8_t EEMEM uart_databits;
-extern uint8_t EEMEM uart_parity;
-extern uint8_t EEMEM uart_stopbits;
-#endif /* HAVE_UART */
+/**
+ * @brief Pato configuration structure
+ *
+ * Represents EEPROM layout containing all the configuration variables
+ * used in Pato.
+ *
+ * @note 
+ * This structure contains configuration variables even for 
+ * those features that are not compiled in. This is for simplicity of 
+ * creating of EEP files. This may change in the future when Pato grows 
+ * high.
+ */
+typedef struct _pato_config {
+   uint8_t hd44780_initfunc; /**< 
+         Parameter initial hd44780_reset(). Normally this contains 
+         @ref HD44780_CMD_FUNC_SET command with parameters. 
+         This value is crucial for switching HD44780 to 4-bit mode. 
+         Also for my display FUNC_SET takes effect only immediately after
+         reset. Any later invocation of this function does not affect 
+         display operation. */
 
-extern uint8_t EEMEM hd44780_initfunc;
+   uint32_t uart_baudrate; /**< UART baud rate in bits/sec. Default is 9600 */
+   uint8_t uart_databits; /**< UART data bits in single frame. Default 8. */
+   uint8_t uart_parity; /**< UART parity bit (2 means NONE, 0 means EVEN,
+                           1 means ODD. Default is 2 */
+   uint8_t uart_stopbits; /**< UART Number of stop bits in single frame.
+                             Default 1 */
 
-extern uint8_t EEMEM tty_height;
-extern uint8_t EEMEM tty_linemap[8];
-extern uint8_t EEMEM tty_policy;
+   uint8_t tty_height; /**< Number of lines in HD44780 display */
+   uint8_t tty_linemap[8]; /**<
+         HD44780 line map. Specifies exact address mapping for each HD44780
+         line. Must contains tty_height byte pairs. Each pair is start address
+         and end address of the corresponding line respectively.
 
-#if defined (HAVE_TWI)
-extern uint32_t EEMEM twi_baudrate;
-extern uint8_t EEMEM twi_slaveaddr;
-#endif /* HAVE_TWI */
+         For example two line HD44780 16x2 display may have 40 bytes of DDRAM,
+         first line occupying bytes from 0 to 19 and second line occupying
+         bytes from 20 till 39. Since only 16 bytes of line is visible,
+         we can define the tty_linemap as { 0, 16, 20, 36 } array.
+         @note
+         Each pair is left-closed, right-open interval. */
+   uint8_t tty_policy; /**< TTY configuration. See @ref tty_policy_t.
+                          Default 0x08 */
+
+   uint32_t twi_baudrate; /**< TWI frequency in Hz. Default 100000. */
+   uint8_t twi_slaveaddr; /**< TWI slave address of Pato. Default 0x41 */
+} pato_config_t;
+
+extern pato_config_t EEMEM g_pato_config;
 
 #endif /* __ASSEMBLY__ */
 #endif /* _pato_config_h_ */

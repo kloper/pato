@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
    
    comm_init();
 
-   reset_value = eeprom_read_byte(&hd44780_initfunc);
+   reset_value = eeprom_read_byte(&g_pato_config.hd44780_initfunc);
 
    hd44780_reset(reset_value);
    

@@ -45,21 +45,19 @@
 #include "config.h"
 #include "hd44780.h"
 
-#if defined(HAVE_UART)
-uint32_t EEMEM uart_baudrate = 9600;
-uint8_t EEMEM uart_databits = 8;
-uint8_t EEMEM uart_parity = 2;
-uint8_t EEMEM uart_stopbits = 1;
-#endif /* HAVE_UART */
+pato_config_t EEMEM g_pato_config = {
+   /* uint8_t hd44780_initfunc */ HD44780_CMD_FUNC_SET |
+                                  HD44780_CMD_FUNC_2LINES,
 
-uint8_t EEMEM hd44780_initfunc = HD44780_CMD_FUNC_SET  |
-				 HD44780_CMD_FUNC_2LINES;
+   /* uint32_t uart_baudrate */ 9600,
+   /* uint8_t uart_databits */ 8,
+   /* uint8_t uart_parity */ 2,
+   /* uint8_t uart_stopbits */ 1,
 
-uint8_t EEMEM tty_height = 4;
-uint8_t EEMEM tty_linemap[8] = { 0, 20, 64, 84, 20, 40, 84, 104 };
-uint8_t EEMEM tty_policy = (4<<1);
+   /* uint8_t tty_height */ 4,   
+   /* uint8_t tty_linemap[8] */ { 0, 20, 64, 84, 20, 40, 84, 104 },
+   /* uint8_t tty_policy */ (4<<1),   
 
-#if defined(HAVE_TWI)
-uint32_t EEMEM twi_baudrate = 100000;
-uint8_t EEMEM twi_slaveaddr = 0x41;
-#endif /* HAVE_TWI */
+   /* uint32_t twi_baudrate */ 100000,   
+   /* uint8_t twi_slaveaddr */ 0x41
+};
