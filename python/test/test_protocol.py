@@ -64,14 +64,15 @@ class NullTest(unittest.TestCase):
 
     def test_ping(self):
         pato = Pato(self.transport)
-        for i in xrange(200):
+        for i in xrange(100):
             rc = pato.execute(Cmd.PING, i & 0xff)
             self.logger.info("pong: %s", rc)
             self.assertTrue(rc == (i + 1) & 0xff)
 
     def test_write(self):
         pato = Pato(self.transport)
-        for txt in ["Hello World", "!!!Hello World"]:
+        for txt in ["Hello World"] * 10:
+            rc = pato.execute(Cmd.DIRECT, Direct.CLR)
             for c in txt:
                 rc = pato.execute(Cmd.DIRECT, Direct.WRITE, ord(c))
                 # pdb.set_trace()
@@ -227,7 +228,7 @@ class BridgeTransport(NullTest):
     def setUpClass(cls):
         cls.logger = logger
         cls.transport = Bridge(slave_addr=0x41,
-                               port='COM102',
+                               port='COM97',
                                baudrate=57600,
                                timeout=10)
         cls.query_method = cls.transport.query
@@ -309,6 +310,6 @@ class BridgeTransport(NullTest):
         self.transport.query = self.short_packet_query
 
         pato = Pato(self.transport)
-        for i in xrange(10000):
+        for i in xrange(100):
             self.assertRaises(ProtocolException,
                               pato.execute, Cmd.PING, i & 0xff)

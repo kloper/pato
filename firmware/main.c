@@ -48,6 +48,7 @@
 #include "hd44780.h"
 #include "uart.h"
 #include "twi.h"
+#include "usi.h"
 #include "crc.h"
 #include "print.h"
 
@@ -63,6 +64,12 @@
 #define comm_recv twi_slave_recv
 #define comm_send twi_slave_send
 #define comm_skip twi_slave_skip
+#elif defined(HAVE_USI)
+#define comm_init usi_init
+#define comm_outbuf usi_outbuf
+#define comm_recv usi_slave_recv
+#define comm_send usi_slave_send
+#define comm_skip usi_slave_skip
 #else
 #error "No communication interface has been configured"
 #endif
@@ -109,13 +116,13 @@ int main(int argc, char *argv[])
    hd44780_reset(reset_value);
    
    hd44780_ir_write(HD44780_CMD_DISPLAY         |
-		    HD44780_CMD_DISPLAY_ON      |
-		    HD44780_CMD_DISPLAY_CURS_ON |
-		    HD44780_CMD_DISPLAY_CURS_BLINK );
+        	    HD44780_CMD_DISPLAY_ON      |
+        	    HD44780_CMD_DISPLAY_CURS_ON |
+        	    HD44780_CMD_DISPLAY_CURS_BLINK );
    hd44780_wait_busy();
    
    hd44780_ir_write(HD44780_CMD_EMS |
-		    HD44780_CMD_EMS_INCR);
+        	    HD44780_CMD_EMS_INCR);
    hd44780_wait_busy();
 
    sei();

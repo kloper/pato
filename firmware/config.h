@@ -61,10 +61,8 @@
 #endif
 
 #if defined(__AVR_ATtiny2313__)
-#define HAVE_UART 
-#undef HAVE_TWI
-#define HAVE_PRINT
-#undef HAVE_PRINTF
+#define HAVE_USI
+#undef HAVE_PRINT
 #define HAVE_DIRECT_API
 #endif
 

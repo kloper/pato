@@ -76,14 +76,15 @@ class Test(unittest.TestCase):
 
     def test_master_send(self):
         bridge = Bridge(self.transport)
-        for _ in xrange(100):
-            rc = bridge.execute(Cmd.TWI_MASTER_SEND, 0x50, [1], 1)
+        for _ in xrange(1):
+            rc = bridge.execute(Cmd.TWI_MASTER_SEND, 0x41,
+                                [1, 2, 5, 0xa, 0xe], 1)
             self.logger.info("sent: %s", rc)
 
     def test_master_recv(self):
         bridge = Bridge(self.transport)
         for _ in xrange(100):
-            rc = bridge.execute(Cmd.TWI_MASTER_RECV, 0x50, 10, 1, 1)
+            rc = bridge.execute(Cmd.TWI_MASTER_RECV, 0x41, 9, 1, 1)
             self.logger.info("received: %s", rc)
 
     def test_at24c02_read(self):
