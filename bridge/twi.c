@@ -70,6 +70,11 @@ twi_config_t g_twi_config = {
    .twbr = 72
 };
 
+#ifdef DEBUG_TWI
+uint8_t g_twi_states[10];
+uint8_t g_twi_states_cur = 0;
+#endif /* DEBUG_TWI */
+
 ISR(TWI_vect)
 {
 volatile uint8_t twsr, twcr;
@@ -77,6 +82,12 @@ volatile uint8_t twsr, twcr;
    
    twsr = TWSR & 0xF8;
 
+#ifdef DEBUG_TWI
+   g_twi_states[g_twi_states_cur++] = twsr;
+   if(g_twi_states_cur >= sizeof(g_twi_states))
+      g_twi_states_cur = 0;
+#endif /* DEBUG_TWI */
+   
    if(g_twi_state.count == 0) {
       twsr = 0xff;
       exit = 1;
