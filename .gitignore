@@ -13,6 +13,7 @@ cscope.out
 *.pyc
 *.log
 */Debug/*
+*/Release/*
 */.backup/*
 */doxyout/*
 *.atsuo
