@@ -53,7 +53,10 @@ to_start:
 	andi	r24, 0x7
 	sts	TCCR0B, r1	
 	sts	TCNT0, r1	
-	sbi	_SFR_IO_ADDR(TIFR0), TOV0
+	;; sbi	_SFR_IO_ADDR(TIFR0), TOV0
+        lds     r25, TIFR0
+        ori     r25, (1<<TOV0)
+        sts     TIFR0, r25
 	sts	TCCR0A, r1
 	sts	TCCR0B, r24	
 	ret
@@ -63,7 +66,9 @@ to_start:
 	.func to_check
 to_check:
 	clr 	r24
-	sbic	_SFR_IO_ADDR(TIFR0), TOV0 
+	;; sbic	_SFR_IO_ADDR(TIFR0), TOV0 
+        lds     r25, TIFR0
+        sbrc    r25, TOV0
 	inc	r24
 	ret
 	.endfunc
