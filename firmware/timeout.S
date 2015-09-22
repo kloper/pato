@@ -50,6 +50,7 @@
 	;; Input:
 	;; r24 - prescale
 to_start:
+        cli
 	andi	r24, 0x7
 	sts	TCCR0B, r1	
 	sts	TCNT0, r1	
@@ -59,18 +60,19 @@ to_start:
         sts     TIFR0, r25
 	sts	TCCR0A, r1
 	sts	TCCR0B, r24	
-	ret
+	reti
 	.endfunc
 
 	.global to_check
 	.func to_check
 to_check:
+        cli
 	clr 	r24
 	;; sbic	_SFR_IO_ADDR(TIFR0), TOV0 
         lds     r25, TIFR0
         sbrc    r25, TOV0
 	inc	r24
-	ret
+	reti
 	.endfunc
 
 	
