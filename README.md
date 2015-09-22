@@ -4,10 +4,17 @@ Pato turns Arduino Pro Mini (or any other Atmega based board) and its
 attached HD44780-based display into printf() machine with small
 subset of VT100 controls.
 
+| New Stuff!!
+| :----------
+| I have just completed USI I2C driver for Attiny2313.
+| The chip has very small amount of flash, so I was unable to pack
+| the printf API in. Nevertheless, the direct HD44780 API works pretty
+| well.
+
 ## Yet another Arduino library?
 
-Pato is *NOT* Arduino display driver libary. If you need
-one, just google it - you will probaly find the LiquidCrystal for
+Pato is *NOT* Arduino display driver library. If you need
+one, just google it - you will probably find the LiquidCrystal for
 Arduino. Use it, it is great!
 
 Pato is for those who want to save their valuable i/o pins, flash and
@@ -33,7 +40,7 @@ components:
  * VT100 terminal controls support. Right now only basic control characters
    are supported.
 
-## Hey, I can get such a thing on ebay for a buck!
+## Hey, I can get such a thing on eBay for a buck!
 
 Sure there are other similar solutions. Cheap ones provide only
 core functionality, allowing to reduce number of i/o pins used to
@@ -45,12 +52,13 @@ expensive and are often closed source.
 ## What chips are supported?
 
 My initial goal was to drive the display with Arduino Pro Mini that
-can be found on ebay for a few bucks. Thus, Atmega328 and Atmega328p are
-supplorted. Atmega2560 is supported too. Support for Attiny2313 is under
-development.
+can be found on eBay for a few bucks. Thus, Atmega328 and Atmega328p are
+supported. Atmega2560 is supported too. 
 
 In fact, porting to any Atmega is trivial, provided it has enough flash
 memory, RAM, i/o pins and UART/TWI compatible with Atmega328.
+
+I2C for Attiny2313 is supported but I still consider it experimental.
 
 ## License
 
