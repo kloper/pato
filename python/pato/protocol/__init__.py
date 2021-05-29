@@ -78,7 +78,7 @@ class Reply:
     @brief Enumerator of valid reply codes
     @see pato_protocol
     """
-    OK = 0x00
+    OK = 0xfe
     ERROR = 0xff
 
 class Error:

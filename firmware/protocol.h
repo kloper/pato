@@ -478,7 +478,7 @@
  * Value to be put in packet_t::cmd field in reply packets to indicate 
  * command success.
  */
-#define PATO_REPLY_OK    0x00
+#define PATO_REPLY_OK    0xfe
 
 /**
  * @brief Reply Error Indicator
