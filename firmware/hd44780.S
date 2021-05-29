@@ -150,8 +150,8 @@ hd44780_reset:
 
 10:
         ;; set reset pin up, wait till HD44780 completes boot
-        delay 0x7f
         sbi HD44780_CTRL_OUT, HD44780_RST
+        delay 0x7f
         mov r25, r24
         rcall hd44780_wait_busy
 
@@ -160,11 +160,23 @@ hd44780_reset:
         ;; "Initializing by Instruction" section Table 12
         
         ;; r24 (input param) is supposed to be loaded with FUNC_SET command
-        ;; with 4-bit mode enabled. 
+        ;; with 4-bit mode enabled.
+        ldi r24, 3
+        rcall nibble_out
+        delay 0x7f
+
+	ldi r24, 3
+        rcall nibble_out
+        delay 0x7f
+
+	ldi r24, 3
+        rcall nibble_out
+        delay 0x7f
+        
         mov r24, r25    
         swap r24
         rcall nibble_out
-        delay 0x8
+        delay 0x7f
 
         ;; recover r24 again and send full command
         mov r24, r25
