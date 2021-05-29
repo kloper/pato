@@ -138,21 +138,21 @@ int main(int argc, char *argv[])
       INCR_COUNTER_RECV;
       
       if( packet->zero != 0 ) {
-	 reply->cmd = PATO_REPLY_ERROR;
 	 reply->arg0 = PATO_ERROR_SEP;
-	 reply->arg1 = packet->cmd;
+	 reply->arg1 = packet->cmd;        
+	 reply->cmd = PATO_REPLY_ERROR;
          INCR_ERROR_SEP;
       } else if(packet->crc != crc8( (uint8_t*)packet, sizeof(packet_t) - 2)) {
-	 reply->cmd = PATO_REPLY_ERROR;
 	 reply->arg0 = PATO_ERROR_CRC;
-	 reply->arg1 = packet->cmd;
+	 reply->arg1 = packet->cmd;        
+	 reply->cmd = PATO_REPLY_ERROR;
          INCR_ERROR_CRC;
       } else {
 	 switch(packet->cmd) {
 	    case PATO_CMD_PING:
-	       reply->cmd = PATO_REPLY_OK;
 	       reply->arg0 = packet->cmd;
-	       reply->arg1 = packet->arg1 + 1;
+	       reply->arg1 = packet->arg1 + 1;              
+	       reply->cmd = PATO_REPLY_OK;
 	       break;
 #if defined(HAVE_DIRECT_API)
 	    case PATO_CMD_DIRECT:
@@ -201,9 +201,9 @@ int main(int argc, char *argv[])
 		  reply->cmd = PATO_REPLY_OK;
 		  reply->arg0 = hd44780_wait_busy();
 	       } else {
-		  reply->cmd = PATO_REPLY_ERROR;
 		  reply->arg0 = PATO_ERROR_BADARG;
-		  reply->arg1 = packet->cmd;
+		  reply->arg1 = packet->cmd;                 
+		  reply->cmd = PATO_REPLY_ERROR;
                   INCR_ERROR_OTHER;
 	       }
 	       break;
@@ -227,18 +227,18 @@ int main(int argc, char *argv[])
 #if defined(HAVE_PRINT)
                hd44780_print_reset();
 #endif /* HAVE_PRINT */
-               
-	       reply->cmd = PATO_REPLY_OK;
+
 	       reply->arg0 = cmd;
-	       reply->arg1 = packet->cmd;
+	       reply->arg1 = packet->cmd;               
+	       reply->cmd = PATO_REPLY_OK;
 	       break;
 #endif /* HAVE_DIRECT_API */               
 #if defined(HAVE_PRINT)               
 	    case PATO_CMD_PRINT_SETADDR:
 	       cmd = hd44780_print_set_addr(*(uint16_t*)&packet->arg0);
-	       reply->cmd = PATO_REPLY_OK;
 	       reply->arg0 = cmd;
-	       reply->arg1 = packet->cmd;
+	       reply->arg1 = packet->cmd;               
+	       reply->cmd = PATO_REPLY_OK;
 	       break;
 	    case PATO_CMD_PRINT_GETADDR: {
 	       *(uint16_t*)&reply->arg0 = hd44780_print_get_addr();
@@ -246,27 +246,27 @@ int main(int argc, char *argv[])
 	    } break;
 	    case PATO_CMD_PRINT_COMMIT:
 	       cmd = hd44780_print_commit(*(uint16_t*)&packet->arg0);
-	       reply->cmd = PATO_REPLY_OK;
 	       reply->arg0 = cmd;
 	       reply->arg1 = packet->cmd;
+	       reply->cmd = PATO_REPLY_OK;
 	       break;
 	    case PATO_CMD_PRINT_PUT:
 	       cmd = hd44780_print_put(packet->arg0, packet->arg1);
-	       reply->cmd = PATO_REPLY_OK;
 	       reply->arg0 = cmd;
 	       reply->arg1 = packet->cmd;
+	       reply->cmd = PATO_REPLY_OK;
 	       break;
 	    case PATO_CMD_PRINT_PUT_PTR:
 	       cmd = hd44780_print_put_ptr(*(uint16_t*)&packet->arg0);
-	       reply->cmd = PATO_REPLY_OK;
 	       reply->arg0 = cmd;
 	       reply->arg1 = packet->cmd;
+	       reply->cmd = PATO_REPLY_OK;
 	       break;
 #endif /* HAVE_PRINT */          
 	    default:
-	       reply->cmd = PATO_REPLY_ERROR;
 	       reply->arg0 = PATO_ERROR_BADCMD;
 	       reply->arg1 = packet->cmd;
+	       reply->cmd = PATO_REPLY_ERROR;
                INCR_ERROR_OTHER;
 	       break;
 	 }
