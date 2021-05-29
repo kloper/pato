@@ -38,7 +38,6 @@ official policies, either expressed or implied, of the Pato Project.
 """
 
 import serial
-import types
 
 from util.protocol import ProtocolException
 
@@ -78,10 +77,7 @@ class Uart(object):
         @returns Received reply packet
         @throws ProtocolException upon send or receive error
         """
-
-        if not isinstance(request, types.StringType): #pylint: disable=no-member
-            request = "".join(chr(c) for c in request)
-        bytes_written = self.serial.write(request)
+        bytes_written = self.serial.write(bytes(request))
 
         if bytes_written != len(request):
             raise ProtocolException("Failed to send request")

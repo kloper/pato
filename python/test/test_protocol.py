@@ -51,6 +51,7 @@ from pato import Pato
 from pato.protocol import Cmd, Direct
 from pato.transport.uart import Uart
 from pato.transport.bridge import Bridge, ProtocolException
+from pato.transport.aardvark import Aardvark
 
 from util import float2str, int2str, pairs, range as xrange
 
@@ -65,6 +66,7 @@ class NullTest(unittest.TestCase):
     def test_ping(self):
         pato = Pato(self.transport)
         for i in xrange(100):
+            breakpoint()
             rc = pato.execute(Cmd.PING, i & 0xff)
             self.logger.info("pong: %s", rc)
             self.assertTrue(rc == (i + 1) & 0xff)
@@ -102,6 +104,7 @@ class NullTest(unittest.TestCase):
         pato.execute(Cmd.DIRECT, Direct.EMS, True, False)
 
     def test_print(self):
+        breakpoint()
         pato = Pato(self.transport)
 
         self.reset_pato(pato)
@@ -217,18 +220,28 @@ class UartTransport(NullTest):
     @classmethod
     def setUpClass(cls):
         cls.logger = logger
-        cls.transport = Uart(port='COM83', baudrate=9600, timeout=10)
+        cls.transport = Uart(port='COM5', baudrate=9600, timeout=10)
 
     @classmethod
     def tearDownClass(cls):
         cls.transport.close()
 
+class AardvarkTransport(NullTest):
+    @classmethod
+    def setUpClass(cls):
+        cls.logger = logger
+        cls.transport = Aardvark(aardvark_port=0, slave_addr=0x41)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.transport.close()
+        
 class BridgeTransport(NullTest):
     @classmethod
     def setUpClass(cls):
         cls.logger = logger
         cls.transport = Bridge(slave_addr=0x41,
-                               port='COM97',
+                               port='COM7',
                                baudrate=57600,
                                timeout=10)
         cls.query_method = cls.transport.query

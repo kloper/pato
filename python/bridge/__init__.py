@@ -97,7 +97,7 @@ class Bridge(object):
 
         #pylint: disable=no-member
         request = request_class.compile(*args, **kwargs)
-        bytes_written = self.transport.write("".join(chr(c) for c in request))
+        bytes_written = self.transport.write(bytes(request))
 
         if bytes_written != len(request):
             raise ProtocolException("Failed to send request")
@@ -106,10 +106,10 @@ class Bridge(object):
         head = self.transport.read(reply_size)
         if len(head) != reply_size:
             raise ProtocolException("Failed to receive reply")
-        reply_size = ord(head[1])+1
+        reply_size = head[1]+1
         body = self.transport.read(reply_size)
         if len(body) != reply_size:
             raise ProtocolException("Failed to receive reply")
-        result = reply_class.parse([ord(c) for c in head+body])
+        result = reply_class.parse(head+body)
 
         return result

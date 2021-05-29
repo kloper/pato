@@ -95,7 +95,7 @@ class Bridge(object):
         @returns Received reply packet
         @throws ProtocolException upon send or receive timeout
         """
-        now = time.clock()
+        now = time.monotonic()
         elapsed = now
         while elapsed - now < self.timeout:
             (send_status, send_remaining) = \
@@ -109,7 +109,7 @@ class Bridge(object):
                                     self.slave_addr,
                                     5, 1, 1)
 
-            elapsed = time.clock()
+            elapsed = time.monotonic()
             if send_remaining + recv_remaining != 0:
                 print("send_remaining: {} status {:02x}".\
                         format(send_remaining, send_status))

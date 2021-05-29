@@ -80,9 +80,11 @@ class TwiMasterSend(Reply):
     @classmethod
     def parse(cls, packet):
         cmd, content = super(TwiMasterSend, cls).parse(packet)
-        cls.assert_true(cmd == Cmd.TWI_MASTER_SEND and len(content) == 2,
-                        "TWI MASTER SEND received wrong reply: {}".\
-                        format(packet))
+        cls.assert_true(cmd == Cmd.TWI_MASTER_SEND,
+            'unexpected cmd: {}, epected Cmd.TWI_MASTER_SEND', cmd)
+        cls.assert_true(len(content) == 2,
+                        "TWI MASTER SEND received wrong payload: {}".\
+                        format(content))
         return (content[0], content[1])
 
 TwiMasterSend.register(Cmd.TWI_MASTER_SEND)
@@ -95,9 +97,10 @@ class TwiMasterRecv(Reply):
     @classmethod
     def parse(cls, packet):
         cmd, content = super(TwiMasterRecv, cls).parse(packet)
-        cls.assert_true(cmd == Cmd.TWI_MASTER_RECV and len(content) >= 2,
-                        "TWI MASTER RECV received wrong reply: {}".\
-                        format(packet))
+        cls.assert_true(cmd == Cmd.TWI_MASTER_RECV,
+            'unexpected cmd: {}, epected Cmd.TWI_MASTER_RECV', cmd)
+        cls.assert_true(len(content) >= 2, "TWI MASTER RECV received wrong payload: {}".\
+                        format(content))
         return (content[0], content[1], content[2:])
 
 TwiMasterRecv.register(Cmd.TWI_MASTER_RECV)

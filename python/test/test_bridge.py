@@ -56,7 +56,7 @@ class Test(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.logger = logger
-        cls.transport = serial.Serial(port='COM102',
+        cls.transport = serial.Serial(port='COM7',
                                       baudrate=57600,
                                       timeout=1)
 
