@@ -81,7 +81,7 @@ typedef struct _usi_state {
 usi_state_t g_usi = {
    .addr = 0xff,
    .index = 5,
-   .data = {0, 0, 0, 0, 0},
+   .data = {0x0, 0x0, 0x0, 0x0, 0x0},
    .state = USI_STATE_INIT
 };
 
@@ -112,7 +112,7 @@ ISR(USI_OVERFLOW_vect)
    
    switch(g_usi.state) {
       case USI_STATE_ADDR: {
-         uint8_t usidr = USIDR;
+         volatile uint8_t usidr = USIDR;
          
          if( (usidr >> 1) != g_usi.addr && usidr )
             goto reset_label;
@@ -120,8 +120,10 @@ ISR(USI_OVERFLOW_vect)
          g_usi.state = (usidr & 1) ? USI_STATE_SEND : USI_STATE_RECV;
             
          // Send ACK
-         USIDR = 0;            
+         USIDR = 0;      
          USI_DDR |= (1<<USI_SDA);
+		 USI_OUT |= (1<<USI_SDA);       
+
          USISR = (1<<USIOIF)|(1<<USIPF)|(1<<USIDC)|
                  (1<<USICNT3)|(1<<USICNT2)|(1<<USICNT1);
       } break;
@@ -129,39 +131,46 @@ ISR(USI_OVERFLOW_vect)
       case USI_STATE_RECV: {
          g_usi.state = USI_STATE_RECV_ACK;
          USI_DDR &= ~(1<<USI_SDA);
-         USISR = (1<<USIOIF)|(1<<USIPF)|(1<<USIDC);
+         USISR = (1<<USIOIF)|(1<<USIPF)|(1<<USIDC)|(1<<USICNT0);
       } break;
 
       case USI_STATE_RECV_ACK: {
-         g_usi.state = USI_STATE_RECV;
          if( g_usi.index >= sizeof(g_usi.data) )
             goto reset_label;
          
+		 g_usi.state = USI_STATE_RECV;
          g_usi.data[g_usi.index] = USIDR;
+		 g_usi.index++;
+				  
          // Send ACK
          USIDR = 0;                        
          USI_DDR |= (1<<USI_SDA);
+		 USI_OUT |= (1<<USI_SDA);
          USISR = (1<<USIOIF)|(1<<USIPF)|(1<<USIDC)|
                  (1<<USICNT3)|(1<<USICNT2)|(1<<USICNT1);
-         g_usi.index++;
       } break;
 
-      case USI_STATE_SEND_FIN:
-         USI_DDR &= ~(1<<USI_SDA);
-         if( USIDR ) // NACK received
+      case USI_STATE_SEND_FIN: {	
+		 volatile uint8_t usidr = USIDR;
+         if( (usidr & 3) !=0 ) { // NACK received
             goto reset_label;
+		 }
+		 
+		 USIDR = 0;
+		 USI_DDR |= (1<<USI_SDA);
+		 USI_OUT |= (1<<USI_SDA);
+		 
+		 g_usi.index++;
          // Fall through to USI_STATE_SEND
-         
+	  }
       case USI_STATE_SEND: {
          if( g_usi.index >= sizeof(g_usi.data) )
             goto reset_label;
-         
+		
          g_usi.state = USI_STATE_SEND_ACK;            
-         USIDR = g_usi.data[g_usi.index];
-         USI_DDR |= 1<<USI_SDA;
-         USI_OUT |= (1<<USI_SDA);            
-         USISR = (1<<USIOIF)|(1<<USIPF)|(1<<USIDC);
-         g_usi.index++;
+        
+		 USIDR = g_usi.data[g_usi.index];
+         USISR = (1<<USIOIF)|(1<<USIPF)|(1<<USIDC)|(1<<USICNT0);
       } break;
 
       case USI_STATE_SEND_ACK: {
@@ -169,7 +178,7 @@ ISR(USI_OVERFLOW_vect)
 
          // Receive ACK
          USIDR = 0; 
-         USI_DDR &= ~(1<<USI_SDA);
+         USI_DDR &= ~(1<<USI_SDA);     
          USISR = (1<<USIOIF)|(1<<USIPF)|(1<<USIDC)|
                  (1<<USICNT3)|(1<<USICNT2)|(1<<USICNT1); 
       } break;
@@ -198,7 +207,7 @@ void usi_init()
 
 static void usi_slave_wait()
 {
-   uint8_t index = 0;
+   volatile uint8_t index = 0;
 
    cli();
    g_usi.index = 0;
@@ -214,6 +223,7 @@ static void usi_slave_wait()
 
       if(index >= sizeof(g_usi.data)) break;
 	 
+
       sleep_mode();
 
    } while(1);
