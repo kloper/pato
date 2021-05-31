@@ -79,6 +79,13 @@ class NullTest(unittest.TestCase):
                 rc = pato.execute(Cmd.DIRECT, Direct.WRITE, ord(c))
                 # pdb.set_trace()
 
+    def test_fill(self):
+        pato = Pato(self.transport)
+        text = 'abcdefghijklmnoprqsuvwxyzABCDEFGHIJKLMNOPRQSUVWXYZ0123456789!@#$%^&*()_+'
+        rc = pato.execute(Cmd.DIRECT, Direct.CLR)
+        for c in text:
+            rc = pato.execute(Cmd.DIRECT, Direct.WRITE, ord(c))
+                
     def test_read(self):
         pato = Pato(self.transport)
 
