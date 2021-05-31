@@ -68,6 +68,7 @@
 #define HAVE_PRINT_MINIMAL
 #define HAVE_DIRECT_API
 #undef DEBUG_USI
+#define DISPLAY1602 1
 #endif
 
 #define min(a,b) (((a)<(b))?(a):(b))
