@@ -70,11 +70,18 @@ typedef enum _usi_state_enum {
    USI_STATE_RECV_ACK
 } usi_state_enum_t;
 
+typedef enum _use_mode_enum {
+  USI_MODE_WAIT,
+  USI_MODE_RECV,
+  USI_MODE_SEND,
+} usi_mode_enum_t;
+
 typedef struct _usi_state {
-   uint8_t addr;
-   uint8_t index;
-   uint8_t data[sizeof(packet_t)];
-   usi_state_enum_t state;
+  uint8_t addr;
+  uint8_t index;
+  uint8_t data[sizeof(packet_t)];
+  usi_state_enum_t state;
+  usi_mode_enum_t mode;
 } usi_state_t;
 
 
@@ -82,7 +89,8 @@ usi_state_t g_usi = {
    .addr = 0xff,
    .index = 5,
    .data = {0x0, 0x0, 0x0, 0x0, 0x0},
-   .state = USI_STATE_INIT
+   .state = USI_STATE_INIT,
+   .mode = USI_MODE_WAIT
 };
 
 #ifdef DEBUG_USI
@@ -114,16 +122,22 @@ ISR(USI_OVERFLOW_vect)
       case USI_STATE_ADDR: {
          volatile uint8_t usidr = USIDR;
          
-         if( (usidr >> 1) != g_usi.addr && usidr )
+         if( (usidr >> 1) != g_usi.addr )
             goto reset_label;
          
          g_usi.state = (usidr & 1) ? USI_STATE_SEND : USI_STATE_RECV;
-            
-         // Send ACK
-         USIDR = 0;      
-         USI_DDR |= (1<<USI_SDA);
-		 USI_OUT |= (1<<USI_SDA);       
 
+         USIDR = 0;      
+         
+         if( (g_usi.state == USI_STATE_SEND && g_usi.mode == USI_MODE_SEND) ||
+             (g_usi.state == USI_STATE_RECV && g_usi.mode == USI_MODE_RECV) ) {
+           // Send ACK
+           USI_DDR |= (1<<USI_SDA);
+           USI_OUT |= (1<<USI_SDA);       
+         } else {
+           // Send NACK
+         }
+         
          USISR = (1<<USIOIF)|(1<<USIPF)|(1<<USIDC)|
                  (1<<USICNT3)|(1<<USICNT2)|(1<<USICNT1);
       } break;
@@ -136,11 +150,11 @@ ISR(USI_OVERFLOW_vect)
 
       case USI_STATE_RECV_ACK: {
          if( g_usi.index >= sizeof(g_usi.data) )
-            goto reset_label;
+           goto reset_label;
          
-		 g_usi.state = USI_STATE_RECV;
+         g_usi.state = USI_STATE_RECV;
          g_usi.data[g_usi.index] = USIDR;
-		 g_usi.index++;
+         g_usi.index++;
 				  
          // Send ACK
          USIDR = 0;                        
@@ -151,25 +165,25 @@ ISR(USI_OVERFLOW_vect)
       } break;
 
       case USI_STATE_SEND_FIN: {	
-		 volatile uint8_t usidr = USIDR;
-         if( (usidr & 3) !=0 ) { // NACK received
-            goto reset_label;
-		 }
+        g_usi.index++;
+		
+        volatile uint8_t usidr = USIDR;
+        if( (usidr & 3) != 0 ) // NACK received
+          goto reset_label;
+       		 
+        USIDR = 0;
+        USI_DDR |= (1<<USI_SDA);
+        USI_OUT |= (1<<USI_SDA);
 		 
-		 USIDR = 0;
-		 USI_DDR |= (1<<USI_SDA);
-		 USI_OUT |= (1<<USI_SDA);
-		 
-		 g_usi.index++;
-         // Fall through to USI_STATE_SEND
-	  }
+        // Fall through to USI_STATE_SEND
+      }
       case USI_STATE_SEND: {
          if( g_usi.index >= sizeof(g_usi.data) )
             goto reset_label;
 		
          g_usi.state = USI_STATE_SEND_ACK;            
         
-		 USIDR = g_usi.data[g_usi.index];
+         USIDR = g_usi.data[g_usi.index];
          USISR = (1<<USIOIF)|(1<<USIPF)|(1<<USIDC)|(1<<USICNT0);
       } break;
 
@@ -196,13 +210,6 @@ ISR(USI_OVERFLOW_vect)
 
   exit_label:
    USI_DDR &= ~(1<<USI_SCL);
-}
-
-void usi_init()
-{
-   g_usi.addr = eeprom_read_byte(&g_pato_config.twi_slaveaddr);
-   
-   USI_DDR &= ~((1<<USI_SDA)|(1<<USI_SCL));
 }
 
 static void usi_slave_wait()
@@ -233,13 +240,26 @@ static void usi_slave_wait()
 
 void usi_slave_send()
 {
-   usi_slave_wait();
+  cli();
+  g_usi.mode = USI_MODE_SEND;
+  sei();
+
+  usi_slave_wait();  
 }
 
 packet_t *usi_slave_recv()
 {
-   usi_slave_wait();
-   return (packet_t*)g_usi.data;
+  cli();
+  g_usi.mode = USI_MODE_RECV;
+  sei();
+  
+  usi_slave_wait();
+
+  cli();
+  g_usi.mode = USI_MODE_WAIT;
+  sei();
+  
+  return (packet_t*)g_usi.data;
 }
 
 /**
@@ -254,4 +274,10 @@ void *usi_outbuf()
    return g_usi.data;
 }
 
+void usi_init()
+{
+	g_usi.addr = eeprom_read_byte(&g_pato_config.twi_slaveaddr);
+	
+	USI_DDR &= ~((1<<USI_SDA)|(1<<USI_SCL));
+}
 #endif /* HAVE_USI */
