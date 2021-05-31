@@ -6,7 +6,7 @@ encoding utf-8
 Sheet 1 1
 Title "Pato: attiny2313 driver for HD44780 screens"
 Date "2021-05-18"
-Rev "20210522"
+Rev "20210531"
 Comp ""
 Comment1 "Dimitry Kloper"
 Comment2 "dimitry.kloper@gmail.com"
@@ -666,4 +666,74 @@ Text Notes 2600 1850 0    50   ~ 0
 SDA
 Text Notes 1300 1850 0    50   ~ 0
 SCK
+$Comp
+L Device:R R4
+U 1 1 60B53465
+P 1700 4200
+F 0 "R4" V 1600 4200 50  0000 L CNN
+F 1 "7.5K" V 1700 4100 50  0000 L CNN
+F 2 "Capacitors_SMD:C_0805_HandSoldering" V 1630 4200 50  0001 C CNN
+F 3 "~" H 1700 4200 50  0001 C CNN
+	1    1700 4200
+	0    1    1    0   
+$EndComp
+Text Label 1550 4200 2    50   ~ 0
+MOSI
+$Comp
+L power:+3.3V #PWR019
+U 1 1 60B563EE
+P 1950 4200
+F 0 "#PWR019" H 1950 4050 50  0001 C CNN
+F 1 "+3.3V" V 1965 4328 50  0000 L CNN
+F 2 "" H 1950 4200 50  0001 C CNN
+F 3 "" H 1950 4200 50  0001 C CNN
+	1    1950 4200
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:R R5
+U 1 1 60B583DC
+P 1700 4850
+F 0 "R5" V 1600 4850 50  0000 L CNN
+F 1 "7.5K" V 1700 4750 50  0000 L CNN
+F 2 "Capacitors_SMD:C_0805_HandSoldering" V 1630 4850 50  0001 C CNN
+F 3 "~" H 1700 4850 50  0001 C CNN
+	1    1700 4850
+	0    1    1    0   
+$EndComp
+$Comp
+L power:+3.3V #PWR020
+U 1 1 60B586D6
+P 1950 4850
+F 0 "#PWR020" H 1950 4700 50  0001 C CNN
+F 1 "+3.3V" V 1965 4978 50  0000 L CNN
+F 2 "" H 1950 4850 50  0001 C CNN
+F 3 "" H 1950 4850 50  0001 C CNN
+	1    1950 4850
+	0    1    1    0   
+$EndComp
+Text Label 1550 4850 2    50   ~ 0
+SCK
+$Comp
+L Connector_Generic:Conn_01x02 J3
+U 1 1 60B59877
+P 1850 4000
+F 0 "J3" V 1814 3812 50  0000 R CNN
+F 1 "SDA_PU" V 1950 4050 50  0000 R CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm" H 1850 4000 50  0001 C CNN
+F 3 "~" H 1850 4000 50  0001 C CNN
+	1    1850 4000
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x02 J4
+U 1 1 60B5C8F4
+P 1850 4650
+F 0 "J4" V 1814 4462 50  0000 R CNN
+F 1 "SCK_PU" V 1950 4700 50  0000 R CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm" H 1850 4650 50  0001 C CNN
+F 3 "~" H 1850 4650 50  0001 C CNN
+	1    1850 4650
+	0    -1   -1   0   
+$EndComp
 $EndSCHEMATC
