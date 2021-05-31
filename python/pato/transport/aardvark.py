@@ -59,7 +59,7 @@ class Aardvark(object):
         assert self.handle > 0, \
           f'Unable open aardvark on port {aardvark_port}: {self.handle}'
         AardvarkTransport.aa_configure(self.handle,  AardvarkTransport.AA_CONFIG_SPI_I2C)
-        AardvarkTransport.aa_i2c_pullup(self.handle, AardvarkTransport.AA_I2C_PULLUP_BOTH)
+        AardvarkTransport.aa_i2c_pullup(self.handle, AardvarkTransport.AA_I2C_PULLUP_NONE)
         self.bitrate = AardvarkTransport.aa_i2c_bitrate(self.handle, bitrate)
         self.slave_addr = slave_addr
 
@@ -68,7 +68,7 @@ class Aardvark(object):
             self.handle, self.slave_addr,
             AardvarkTransport.AA_I2C_NO_FLAGS,
             array('B', request))
-        time.sleep(0.2)
+        time.sleep(0.05)
         while True:
             (count, reply) = AardvarkTransport.aa_i2c_read(
                 self.handle, self.slave_addr,
@@ -76,7 +76,7 @@ class Aardvark(object):
                 len(request))
             if count == len(request) and reply[0] in [Reply.OK, Reply.ERROR]:
                 break
-            time.sleep(0.2)
+            time.sleep(0.05)
 
         return reply.tobytes()
 
