@@ -109,8 +109,10 @@ int main(int argc, char *argv[])
    packet_t *packet = NULL, *reply = NULL;
    uint8_t reset_value = 0, cmd = 0;
    
+   cli();
+   
    comm_init();
-
+   
    reset_value = eeprom_read_byte(&g_pato_config.hd44780_initfunc);
 
    hd44780_reset(reset_value);
@@ -123,7 +125,7 @@ int main(int argc, char *argv[])
    
    hd44780_ir_write(HD44780_CMD_EMS |
         	    HD44780_CMD_EMS_INCR);
-   hd44780_wait_busy();
+   hd44780_wait_busy(); 
 
    sei();
 
@@ -233,31 +235,33 @@ int main(int argc, char *argv[])
 	       reply->cmd = PATO_REPLY_OK;
 	       break;
 #endif /* HAVE_DIRECT_API */               
-#if defined(HAVE_PRINT)               
-	    case PATO_CMD_PRINT_SETADDR:
-	       cmd = hd44780_print_set_addr(*(uint16_t*)&packet->arg0);
-	       reply->arg0 = cmd;
-	       reply->arg1 = packet->cmd;               
-	       reply->cmd = PATO_REPLY_OK;
-	       break;
+#if defined(HAVE_PRINT)         
+#if !defined(HAVE_PRINT_MINIMAL)      
 	    case PATO_CMD_PRINT_GETADDR: {
 	       *(uint16_t*)&reply->arg0 = hd44780_print_get_addr();
 	       reply->cmd = PATO_REPLY_OK;
 	    } break;
-	    case PATO_CMD_PRINT_COMMIT:
-	       cmd = hd44780_print_commit(*(uint16_t*)&packet->arg0);
+	    case PATO_CMD_PRINT_PUT_PTR:
+	       cmd = hd44780_print_put_ptr(((uint16_t)packet->arg0 << 8) | packet->arg1);
+	       reply->arg0 = cmd;
+	       reply->arg1 = packet->cmd;
+	       reply->cmd = PATO_REPLY_OK;
+	       break;
+#endif // HAVE_PRINT_MINIMAL
+	    case PATO_CMD_PRINT_SETADDR:
+               cmd = hd44780_print_set_addr(((uint16_t)packet->arg0 << 8) | packet->arg1);
+               reply->arg0 = cmd;
+               reply->arg1 = packet->cmd;
+               reply->cmd = PATO_REPLY_OK;
+	    break;
+            case PATO_CMD_PRINT_COMMIT:
+               cmd = hd44780_print_commit(((uint16_t)packet->arg0 << 8) | packet->arg1 );
 	       reply->arg0 = cmd;
 	       reply->arg1 = packet->cmd;
 	       reply->cmd = PATO_REPLY_OK;
 	       break;
 	    case PATO_CMD_PRINT_PUT:
 	       cmd = hd44780_print_put(packet->arg0, packet->arg1);
-	       reply->arg0 = cmd;
-	       reply->arg1 = packet->cmd;
-	       reply->cmd = PATO_REPLY_OK;
-	       break;
-	    case PATO_CMD_PRINT_PUT_PTR:
-	       cmd = hd44780_print_put_ptr(*(uint16_t*)&packet->arg0);
 	       reply->arg0 = cmd;
 	       reply->arg1 = packet->cmd;
 	       reply->cmd = PATO_REPLY_OK;

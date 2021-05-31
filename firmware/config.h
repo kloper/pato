@@ -64,9 +64,10 @@
 #undef HAVE_TWI
 #undef HAVE_UART 
 #define HAVE_USI
-#undef HAVE_PRINT
+#define HAVE_PRINT
+#define HAVE_PRINT_MINIMAL
 #define HAVE_DIRECT_API
-#define DEBUG_USI 1
+#undef DEBUG_USI
 #endif
 
 #define min(a,b) (((a)<(b))?(a):(b))

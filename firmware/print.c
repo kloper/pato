@@ -190,6 +190,7 @@ static int hd44780_putchar(char c, FILE *stream)
       case '\f':
 	 clear_screen();
 	 return 0;
+#ifndef HAVE_PRINT_MINIMAL
       case '\b': {
 	 tty_coord_t bcoord = coord_add(pcoord, -1, 0);
 	 goto_addr(coord2addr(bcoord));
@@ -209,6 +210,7 @@ static int hd44780_putchar(char c, FILE *stream)
          }
          return 0;
       } 
+#endif
       case '\v': {
          goto_addr(coord2addr(coord_add(pcoord, 0, 1)));
          return 0;
@@ -311,21 +313,6 @@ uint8_t hd44780_print_commit(uint16_t offset)
    return 1;
 }
 
-uint8_t hd44780_print_set_addr(uint16_t addr)
-{
-   if( addr >= 0 && addr < PATO_PRINT_BUFFER_SIZE-2 ) {
-      print_buffer.addr = addr;
-      return 1;
-   }
-
-   return 0;
-}
-
-uint16_t hd44780_print_get_addr()
-{
-   return print_buffer.addr;
-}
-
 /**
  * @brief Put two bytes at current address at print buffer
  * 
@@ -348,6 +335,23 @@ uint8_t hd44780_print_put(uint8_t arg0, uint8_t arg1)
    }
 
    return 0;
+}
+
+uint8_t hd44780_print_set_addr(uint16_t addr)
+{
+	if( addr >= 0 && addr < PATO_PRINT_BUFFER_SIZE-2 ) {
+		print_buffer.addr = addr;
+		return 1;
+	}
+
+	return 0;
+}
+
+#ifndef HAVE_PRINT_MINIMAL
+
+uint16_t hd44780_print_get_addr()
+{
+	return print_buffer.addr;
 }
 
 /**
@@ -380,5 +384,7 @@ uint8_t hd44780_print_put_ptr(uint16_t offset)
 
    return 0;
 }
+
+#endif // HAVE_PRINT_MINIMAL
 
 #endif /* HAVE_PRINT */
