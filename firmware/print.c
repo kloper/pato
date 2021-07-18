@@ -306,7 +306,7 @@ uint8_t hd44780_print_commit(uint16_t offset)
 #if defined(HAVE_PRINTF)      
    vfprintf(&hd44780_out, (const char*)print_buffer.buffer, args);
 #else
-   for( uint8_t *ch = print_buffer.buffer; ch < args; ch++ )
+   for( uint8_t *ch = print_buffer.buffer; *ch != 0 && ch < args; ch++ )
       if( hd44780_putchar(*ch, &hd44780_out) )
          break;
 #endif /* HAVE_PRINTF */
