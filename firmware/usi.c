@@ -94,7 +94,7 @@ usi_state_t g_usi = {
 };
 
 #ifdef DEBUG_USI
-uint8_t g_usi_states[10];
+uint8_t g_usi_states[10] = {0};
 uint8_t g_usi_states_cur = 0;
 #endif /* DEBUG_USI */
 
@@ -161,7 +161,7 @@ ISR(USI_OVERFLOW_vect)
          USI_DDR |= (1<<USI_SDA);
 		 USI_OUT |= (1<<USI_SDA);
          USISR = (1<<USIOIF)|(1<<USIPF)|(1<<USIDC)|
-                 (1<<USICNT3)|(1<<USICNT2)|(1<<USICNT1);
+                 (1<<USICNT3)|(1<<USICNT2)|(1<<USICNT1)|(1<<USICNT0);
       } break;
 
       case USI_STATE_SEND_FIN: {	
@@ -220,6 +220,7 @@ static void usi_slave_wait()
    g_usi.index = 0;
    sei();
 
+   g_usi.state = USI_STATE_INIT;
    USICR = (1<<USISIE)|(1<<USIWM1)|(1<<USICS1);
    USISR = (1<<USISIF)|(1<<USIOIF)|(1<<USIPF)|(1<<USIDC);
    
